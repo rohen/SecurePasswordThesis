@@ -5,4 +5,8 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="author_name">Ali Tamás BME</string>
+
+    <string name="add_password_value">Password</string>
+    <string name="add_password_subject">Subject</string>
+    <string name="add_password_save_button">SAVE</string>
 </resources>

@@ -1,4 +1,4 @@
-package hu.bme.alit.wear.securepassword.securepassword;
+package hu.bme.alit.wear.securepassword.securepassword.ui;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -11,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+
+import hu.bme.alit.wear.securepassword.securepassword.R;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
