@@ -5,15 +5,15 @@ package hu.bme.alit.wear.securepassword.securepassword.helper;
  */
 public interface TimerHelper {
 
-    void startTimer();
+	void startTimer();
 
-    void stopTimerTask();
+	void stopTimerTask();
 
-    void initializeTimerTask(final TimerCallBack timerCallBack, int maxTick, int tickPeriod);
+	void initializeTimerTask(final TimerCallBack timerCallBack, int maxTick, int tickPeriod);
 
-    interface TimerCallBack {
-        void timerTick(int tickNumber);
+	interface TimerCallBack {
+		void timerTick(int tickNumber);
 
-        void timerStop();
-    }
+		void timerStop();
+	}
 }

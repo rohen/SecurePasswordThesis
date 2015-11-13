@@ -7,12 +7,12 @@ import java.util.ArrayList;
  */
 public interface StoreHelper {
 
-    boolean addPassword(String subject, String passwor);
+	boolean addPassword(String subject, String passwor);
 
-    boolean removePassword(String subject);
+	boolean removePassword(String subject);
 
-    ArrayList<String> getSubjects();
+	ArrayList<String> getSubjects();
 
-    String getPassword(String subject);
+	String getPassword(String subject);
 
 }

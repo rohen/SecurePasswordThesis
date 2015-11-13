@@ -10,55 +10,55 @@ import java.util.TimerTask;
  */
 public class DefaultTimerHelper implements TimerHelper {
 
-    private Timer timer;
-    private TimerTask timerTask;
-    private Handler handler = new Handler();
+	private Timer timer;
+	private TimerTask timerTask;
+	private Handler handler = new Handler();
 
-    private int tickNumber;
+	private int tickNumber;
 
-    private TimerCallBack timerCallBack;
-    private int maxTick;
-    private int tickPeriod;
+	private TimerCallBack timerCallBack;
+	private int maxTick;
+	private int tickPeriod;
 
 
-    @Override
-    public void startTimer() {
-        timer = new Timer();
+	@Override
+	public void startTimer() {
+		timer = new Timer();
 
-        timer.schedule(timerTask, 0, tickPeriod);
-    }
+		timer.schedule(timerTask, 0, tickPeriod);
+	}
 
-    @Override
-    public void stopTimerTask() {
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-        }
-        timerCallBack.timerStop();
-    }
+	@Override
+	public void stopTimerTask() {
+		if (timer != null) {
+			timer.cancel();
+			timer = null;
+		}
+		timerCallBack.timerStop();
+	}
 
-    @Override
-    public void initializeTimerTask(final TimerCallBack timerCallBack, final int maxTick, int tickPeriod) {
+	@Override
+	public void initializeTimerTask(final TimerCallBack timerCallBack, final int maxTick, int tickPeriod) {
 
-        this.timerCallBack = timerCallBack;
-        this.maxTick = maxTick;
-        this.tickPeriod = tickPeriod;
+		this.timerCallBack = timerCallBack;
+		this.maxTick = maxTick;
+		this.tickPeriod = tickPeriod;
 
-        timerTask = new TimerTask() {
-            public void run() {
+		timerTask = new TimerTask() {
+			public void run() {
 
-                //use a handler to run a toast that shows the current timestamp
-                handler.post(new Runnable() {
-                    public void run() {
-                        tickNumber++;
-                        if (tickNumber > maxTick) {
-                            stopTimerTask();
-                            return;
-                        }
-                        timerCallBack.timerTick(tickNumber);
-                    }
-                });
-            }
-        };
-    }
+				//use a handler to run a toast that shows the current timestamp
+				handler.post(new Runnable() {
+					public void run() {
+						tickNumber++;
+						if (tickNumber > maxTick) {
+							stopTimerTask();
+							return;
+						}
+						timerCallBack.timerTick(tickNumber);
+					}
+				});
+			}
+		};
+	}
 }

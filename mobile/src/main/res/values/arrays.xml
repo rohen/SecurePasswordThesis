@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string-array name="drawer_list_items">
-        <item>Add new password</item>
-        <item>List passwords</item>
-    </string-array>
+	<string-array name="drawer_list_items">
+		<item>Add new password</item>
+		<item>List passwords</item>
+	</string-array>
+
+	<string-array name="context_menu_items">
+		<item>Delete</item>
+	</string-array>
 </resources>
