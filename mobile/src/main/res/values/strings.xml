@@ -9,4 +9,8 @@
     <string name="add_password_value">Password</string>
     <string name="add_password_subject">Subject</string>
     <string name="add_password_save_button">SAVE</string>
+    <string name="add_password_store_success">Password is stored in the database.</string>
+    <string name="add_password_store_failed">Password cannot be saved/the subject already exists.</string>
+
+    <string name="list_passwords_empty_string">The database is empty</string>
 </resources>
