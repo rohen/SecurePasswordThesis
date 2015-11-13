@@ -8,7 +8,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.ContextMenu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import hu.bme.alit.wear.securepassword.securepassword.R;
 import hu.bme.alit.wear.securepassword.securepassword.utils.NavigationUtils;
