@@ -96,9 +96,9 @@ public class ListFragment extends Fragment implements TimerHelper.TimerCallBack 
 		timerHelper.startTimer();
 	}
 
-	private void createContextMenu(int position) {
+	private void createContextMenu(final int itemPosition) {
 
-		Dialog contextDialog = new Dialog(getActivity(), android.R.style.Theme_DeviceDefault_Light_Dialog);
+		final Dialog contextDialog = new Dialog(getActivity(), android.R.style.Theme_DeviceDefault_Light_Dialog);
 		contextDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.fragment_context_menu, null);
@@ -112,10 +112,12 @@ public class ListFragment extends Fragment implements TimerHelper.TimerCallBack 
 		contextList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				switch(position) {
+				switch (position) {
 					case 0:
-						storeHelper.removePassword(subjects.get(0));
+						storeHelper.removePassword(subjects.get(itemPosition));
+						break;
 				}
+				contextDialog.hide();
 			}
 		});
 	}

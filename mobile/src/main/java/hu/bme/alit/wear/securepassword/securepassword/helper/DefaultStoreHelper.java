@@ -38,7 +38,7 @@ public class DefaultStoreHelper implements StoreHelper {
 
 	@Override
 	public boolean removePassword(String subject) {
-		return passwordMap.remove(subject) != null;
+		return passwordMap.remove(subject) != null && saveData();
 	}
 
 	@Override
