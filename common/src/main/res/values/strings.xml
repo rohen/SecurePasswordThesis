@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="list_passwords_empty_string">The database is empty</string>
+</resources>

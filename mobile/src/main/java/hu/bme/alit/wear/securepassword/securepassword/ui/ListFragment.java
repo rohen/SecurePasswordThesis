@@ -21,10 +21,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import hu.bme.alit.wear.securepassword.securepassword.R;
-import hu.bme.alit.wear.securepassword.securepassword.helper.DefaultStoreHelper;
-import hu.bme.alit.wear.securepassword.securepassword.helper.DefaultTimerHelper;
-import hu.bme.alit.wear.securepassword.securepassword.helper.StoreHelper;
-import hu.bme.alit.wear.securepassword.securepassword.helper.TimerHelper;
+import hu.bme.alit.wear.common.helper.DefaultStoreHelper;
+import hu.bme.alit.wear.common.helper.DefaultTimerHelper;
+import hu.bme.alit.wear.common.helper.StoreHelper;
+import hu.bme.alit.wear.common.helper.TimerHelper;
 
 public class ListFragment extends Fragment implements TimerHelper.TimerCallBack {
 
@@ -59,7 +59,7 @@ public class ListFragment extends Fragment implements TimerHelper.TimerCallBack 
 			listView.setAdapter(new SubjectAdapter(getActivity(), android.R.layout.simple_list_item_1, subjects));
 			listView.setOnItemClickListener(getOnItemClickListeners());
 			listView.setOnItemLongClickListener(getOnItemClickListeners());
-			getActivity().registerForContextMenu(listView);
+			getActivity().registerForContextMenu(listView); //TODO törölni
 		} else {
 			List<String> emptyString = new ArrayList<>();
 			emptyString.add(getString(R.string.list_passwords_empty_string));

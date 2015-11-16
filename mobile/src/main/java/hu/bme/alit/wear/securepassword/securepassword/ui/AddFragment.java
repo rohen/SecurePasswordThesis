@@ -11,10 +11,14 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.android.gms.wearable.DataMap;
+
+import hu.bme.alit.wear.common.SharedData;
+import hu.bme.alit.wear.common.helper.DefaultStoreHelper;
+import hu.bme.alit.wear.common.helper.StoreHelper;
+import hu.bme.alit.wear.common.helper.WearSyncHelper;
 import hu.bme.alit.wear.securepassword.securepassword.R;
-import hu.bme.alit.wear.securepassword.securepassword.helper.DefaultStoreHelper;
-import hu.bme.alit.wear.securepassword.securepassword.helper.StoreHelper;
-import hu.bme.alit.wear.securepassword.securepassword.utils.NavigationUtils;
+import hu.bme.alit.wear.common.utils.NavigationUtils;
 
 public class AddFragment extends Fragment {
 
@@ -85,11 +89,19 @@ public class AddFragment extends Fragment {
 			String subject = subjectEditText.getText().toString();
 			String password = passwordEditText.getText().toString();
 			if (!subject.equals("") && !password.equals("") && storeHelper.addPassword(subject, password)) {
+				sendPasswordToWear(subject, password);
 				showSnackBarMessage(getString(R.string.add_password_store_success));
 				NavigationUtils.navigateToBack(getActivity());
 			} else {
 				showSnackBarMessage(getString(R.string.add_password_store_failed));
 			}
 		}
+	}
+
+	private void sendPasswordToWear(String subject, String password) {
+		final WearSyncHelper wearSyncHelper = ((MainActivity) getActivity()).getWearSyncHelper();
+		DataMap newPassword = new DataMap();
+		newPassword.putStringArray(SharedData.SEND_DATA, storeHelper.createStringArrayFromData(subject, password));
+		wearSyncHelper.sendData(SharedData.SEND_ADDED_PASSWORD, newPassword);
 	}
 }

@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -22,7 +23,7 @@ import com.google.android.gms.wearable.DataMapItem;
 import hu.bme.alit.wear.common.helper.DefaultWearSyncHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
 import hu.bme.alit.wear.securepassword.securepassword.R;
-import hu.bme.alit.wear.securepassword.securepassword.utils.NavigationUtils;
+import hu.bme.alit.wear.common.utils.NavigationUtils;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, DataApi.DataListener,
 		GoogleApiClient.ConnectionCallbacks,
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 		wearSyncHelper = new DefaultWearSyncHelper(this, this, this, this);
 
-		NavigationUtils.navigateToFragment(this, new GreetingsFragment(), GreetingsFragment.FRAGMENT_GREETINGS_TAG, true);
+		NavigationUtils.navigateToFragment(this, getContentFrame(), new GreetingsFragment(), GreetingsFragment.FRAGMENT_GREETINGS_TAG, true);
 
 		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 		navigationView.setNavigationItemSelectedListener(this);
@@ -79,12 +80,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 				break;
 		}
 		if (fragment != null) {
-			NavigationUtils.navigateToFragment(this, fragment, tag, true);
+			NavigationUtils.navigateToFragment(this, getContentFrame(), fragment, tag, true);
 		}
 
 		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 		drawer.closeDrawer(GravityCompat.START);
 		return true;
+	}
+
+	private View getContentFrame() {
+		View appBarMain = findViewById(R.id.app_bar_main);
+		View contentMain = appBarMain.findViewById(R.id.content_main);
+		return contentMain.findViewById(R.id.content_frame);
 	}
 
 	@Override

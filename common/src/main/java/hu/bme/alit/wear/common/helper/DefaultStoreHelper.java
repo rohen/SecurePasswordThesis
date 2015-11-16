@@ -1,4 +1,4 @@
-package hu.bme.alit.wear.securepassword.securepassword.helper;
+package hu.bme.alit.wear.common.helper;
 
 import android.content.Context;
 import android.util.Log;
@@ -50,6 +50,21 @@ public class DefaultStoreHelper implements StoreHelper {
 	@Override
 	public String getPassword(String subject) {
 		return passwordMap.get(subject);
+	}
+
+	@Override
+	public HashMap<String, String> createMapFromStringArray(String[] stringArray) {
+		HashMap<String, String> newMap = new HashMap<>();
+		newMap.put(stringArray[0], stringArray[1]);
+		return newMap;
+	}
+
+	@Override
+	public String[] createStringArrayFromData(String subject, String password) {
+		String[] newStringArray = new String[2];
+		newStringArray[0] = subject;
+		newStringArray[1] = password;
+		return newStringArray;
 	}
 
 	private boolean loadData() {

@@ -1,4 +1,4 @@
-package hu.bme.alit.wear.securepassword.securepassword.helper;
+package hu.bme.alit.wear.common.helper;
 
 import android.os.Handler;
 

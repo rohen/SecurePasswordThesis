@@ -1,4 +1,4 @@
-package hu.bme.alit.wear.securepassword.securepassword.helper;
+package hu.bme.alit.wear.common.helper;
 
 /**
  * Created by tamasali on 2015.11.13..

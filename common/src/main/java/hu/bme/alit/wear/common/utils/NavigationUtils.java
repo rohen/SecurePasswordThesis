@@ -1,4 +1,4 @@
-package hu.bme.alit.wear.securepassword.securepassword.utils;
+package hu.bme.alit.wear.common.utils;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -7,8 +7,6 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
-
-import hu.bme.alit.wear.securepassword.securepassword.R;
 
 /**
  * Utils class for navigation beetween {@link Fragment} and {@link Activity} classes.
@@ -23,11 +21,8 @@ public class NavigationUtils {
 	 * @param tag            the tag.
 	 * @param addToBackStack boolean, {@code true}, if the current page needs to add to the navigation back stack, {@code false} otherwise.
 	 */
-	public static void navigateToFragment(Activity activity, Fragment fragment, String tag, boolean addToBackStack) {
+	public static void navigateToFragment(Activity activity, View contentFrame, Fragment fragment, String tag, boolean addToBackStack) {
 		FragmentManager fragmentManager = activity.getFragmentManager();
-		View appBarMain = activity.findViewById(R.id.app_bar_main);
-		View contentMain = appBarMain.findViewById(R.id.content_main);
-		View contentFrame = contentMain.findViewById(R.id.content_frame);
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 		fragmentTransaction.replace(contentFrame.getId(), fragment, tag);
 		if (addToBackStack) {
