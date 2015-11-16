@@ -2,8 +2,6 @@ package hu.bme.alit.wear.securepassword.securepassword.screen;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.wearable.view.WatchViewStub;
-import android.support.wearable.view.WearableListView;
 import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -15,27 +13,20 @@ import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import hu.bme.alit.wear.common.SharedData;
 import hu.bme.alit.wear.common.helper.DefaultStoreHelper;
 import hu.bme.alit.wear.common.helper.DefaultWearSyncHelper;
 import hu.bme.alit.wear.common.helper.StoreHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
+import hu.bme.alit.wear.common.utils.NavigationUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
-import hu.bme.alit.wear.securepassword.securepassword.list.PasswordListAdapter;
 
 public class MainActivity extends Activity implements DataApi.DataListener,
 		GoogleApiClient.ConnectionCallbacks,
 		GoogleApiClient.OnConnectionFailedListener {
 
-	private WearableListView listView;
-
 	private WearSyncHelper wearSyncHelper;
 	private StoreHelper storeHelper;
-
-	private List<String> subjects;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,14 +36,8 @@ public class MainActivity extends Activity implements DataApi.DataListener,
 		wearSyncHelper = new DefaultWearSyncHelper(this, this, this, this);
 		storeHelper = new DefaultStoreHelper(this);
 
-		final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
-		stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
-			@Override
-			public void onLayoutInflated(WatchViewStub stub) {
-				listView = (WearableListView) stub.findViewById(R.id.password_list);
-				refreshListItems();
-			}
-		});
+		View contentFrame = findViewById(R.id.content_frame);
+		NavigationUtils.navigateToFragment(this, contentFrame, new ListFragment(), ListFragment.FRAGMENT_LIST_PASSWORDS_TAG, true);
 	}
 
 	@Override
@@ -88,8 +73,11 @@ public class MainActivity extends Activity implements DataApi.DataListener,
 					DataMap receivedDataMap = dataMap.get(SharedData.SEND_ADDED_PASSWORD);
 					String[] receivedData = receivedDataMap.getStringArray(SharedData.SEND_DATA);
 					storeHelper.addPassword(receivedData[0], receivedData[1]);
-					refreshListItems();
-
+					//send data to the ListFragment
+					ListFragment listFragment = (ListFragment) getFragmentManager().findFragmentByTag(ListFragment.FRAGMENT_LIST_PASSWORDS_TAG);
+					if(listFragment != null) {
+						listFragment.refreshListItems();
+					}
 				}
 			} else if (event.getType() == DataEvent.TYPE_DELETED) {
 				// DataItem deleted
@@ -102,27 +90,11 @@ public class MainActivity extends Activity implements DataApi.DataListener,
 
 	}
 
-	private void refreshListItems() {
-		subjects = storeHelper.getSubjects();
-
-		if (!subjects.isEmpty()) {
-			listView.setAdapter(new PasswordListAdapter(this, subjects));
-			listView.setOnClickListener(getOnClickListener());
-		} else {
-			List<String> emptyString = new ArrayList<>();
-			emptyString.add(getString(R.string.list_passwords_empty_string));
-			listView.setAdapter(new PasswordListAdapter(this, emptyString));
-		}
+	public StoreHelper getStoreHelper() {
+		return storeHelper;
 	}
 
-	public View.OnClickListener getOnClickListener() {
-		return new PasswordListClickListener();
-	}
-
-	private class PasswordListClickListener implements View.OnClickListener {
-		@Override
-		public void onClick(View v) {
-
-		}
+	public WearSyncHelper getWearSyncHelper() {
+		return wearSyncHelper;
 	}
 }

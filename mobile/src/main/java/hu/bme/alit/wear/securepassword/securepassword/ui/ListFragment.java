@@ -29,6 +29,7 @@ import hu.bme.alit.wear.common.helper.TimerHelper;
 public class ListFragment extends Fragment implements TimerHelper.TimerCallBack {
 
 	public final static String FRAGMENT_LIST_PASSWORDS_TAG = "fragment_list_passwords_tag";
+
 	public final static int MAX_NUMBER_OF_TICK = 100;
 	public final static int TICK_PERIOD = 100;
 
