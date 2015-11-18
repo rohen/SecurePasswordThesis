@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
+import hu.bme.alit.wear.common.R;
+
 /**
  * Utils class for navigation beetween {@link Fragment} and {@link Activity} classes.
  */
@@ -21,13 +23,16 @@ public class NavigationUtils {
 	 * @param tag            the tag.
 	 * @param addToBackStack boolean, {@code true}, if the current page needs to add to the navigation back stack, {@code false} otherwise.
 	 */
-	public static void navigateToFragment(Activity activity, View contentFrame, Fragment fragment, String tag, boolean addToBackStack) {
+	public static void navigateToFragment(Activity activity, View contentFrame, Fragment fragment, String tag, boolean addToBackStack, boolean withAnimation) {
 		FragmentManager fragmentManager = activity.getFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-		fragmentTransaction.replace(contentFrame.getId(), fragment, tag);
+		if (withAnimation) {
+			fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, 0, 0, R.anim.slide_out_left);
+		}
 		if (addToBackStack) {
 			fragmentTransaction.addToBackStack(null);
 		}
+		fragmentTransaction.replace(contentFrame.getId(), fragment, tag);
 		fragmentTransaction.commit();
 	}
 

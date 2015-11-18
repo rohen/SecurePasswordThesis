@@ -37,7 +37,7 @@ public class MainActivity extends Activity implements DataApi.DataListener,
 		storeHelper = new DefaultStoreHelper(this);
 
 		View contentFrame = findViewById(R.id.content_frame);
-		NavigationUtils.navigateToFragment(this, contentFrame, new ListFragment(), ListFragment.FRAGMENT_LIST_PASSWORDS_TAG, true);
+		NavigationUtils.navigateToFragment(this, contentFrame, new ListFragment(), ListFragment.FRAGMENT_LIST_PASSWORDS_TAG, true, true);
 	}
 
 	@Override
