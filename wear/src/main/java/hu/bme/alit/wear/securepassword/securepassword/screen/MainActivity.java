@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
 		registerReceiver(dataBroadcastReceiver, intentFilter);
 
 		View contentFrame = findViewById(R.id.content_frame);
-		NavigationUtils.navigateToFragment(this, contentFrame, new ListFragment(), ListFragment.FRAGMENT_LIST_PASSWORDS_TAG, true, true);
+		NavigationUtils.navigateToFragment(this, contentFrame, new ListFragment(), ListFragment.FRAGMENT_LIST_PASSWORDS_TAG, true, false);
 	}
 
 	@Override
@@ -56,7 +56,6 @@ public class MainActivity extends Activity {
 		return storeHelper;
 	}
 
-
 	public class DataBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -66,8 +65,6 @@ public class MainActivity extends Activity {
 					listFragment.refreshListItems();
 				}
 			}
-
 		}
-
 	}
 }

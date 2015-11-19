@@ -78,7 +78,7 @@ public class ListFragment extends Fragment {
 			Bundle bundle = new Bundle();
 			bundle.putString(DetailsFragment.EXTRA_SUBJECT, subjects.get(viewHolder.getLayoutPosition()));
 			detailsFragment.setArguments(bundle);
-			NavigationUtils.navigateToFragment(getActivity(), contentFrame, detailsFragment, DetailsFragment.FRAGMENT_DETAILS_PASSWORD_TAG, true, true);
+			NavigationUtils.navigateToFragment(getActivity(), contentFrame, detailsFragment, DetailsFragment.FRAGMENT_DETAILS_PASSWORD_TAG, true, false);
 		}
 
 		@Override

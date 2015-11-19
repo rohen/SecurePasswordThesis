@@ -11,4 +11,6 @@
 	<string name="add_password_save_button">SAVE</string>
 	<string name="add_password_store_success">Password is stored in the database.</string>
 	<string name="add_password_store_failed">Password cannot be saved/the subject already exists.</string>
+
+	<string name="greetings_text">Please use the navigation drawer to add new password to the password list.</string>
 </resources>

@@ -1,6 +1,7 @@
 package hu.bme.alit.wear.securepassword.securepassword.ui;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -42,7 +43,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 		wearSyncHelper = new DefaultWearSyncHelper(this, this, this, this);
 
-		NavigationUtils.navigateToFragment(this, getContentFrame(), new GreetingsFragment(), GreetingsFragment.FRAGMENT_GREETINGS_TAG, true, false);
+		if (savedInstanceState == null) {
+			NavigationUtils.navigateToFragment(this, getContentFrame(), new GreetingsFragment(), GreetingsFragment.FRAGMENT_GREETINGS_TAG, true, false);
+		}
 
 		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 		navigationView.setNavigationItemSelectedListener(this);
@@ -54,7 +57,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		if (drawer.isDrawerOpen(GravityCompat.START)) {
 			drawer.closeDrawer(GravityCompat.START);
 		} else {
-			super.onBackPressed();
+			FragmentManager fragmentManager = getFragmentManager();
+			if (fragmentManager.getBackStackEntryCount() > 0) {
+				NavigationUtils.navigateToFragment(this, getContentFrame(), new GreetingsFragment(), GreetingsFragment.FRAGMENT_GREETINGS_TAG, true, false);
+			} else {
+				super.onBackPressed();
+			}
 		}
 	}
 

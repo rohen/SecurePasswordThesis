@@ -43,7 +43,9 @@ public class NavigationUtils {
 	 */
 	public static void navigateToBack(Activity activity) {
 		FragmentManager fragmentManager = activity.getFragmentManager();
-		fragmentManager.popBackStack();
+		if (fragmentManager.getBackStackEntryCount() > 0) {
+			fragmentManager.popBackStack();
+		}
 	}
 
 	/**
