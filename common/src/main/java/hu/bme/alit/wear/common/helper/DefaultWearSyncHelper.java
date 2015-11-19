@@ -42,13 +42,17 @@ public class DefaultWearSyncHelper implements WearSyncHelper {
 
 	@Override
 	public void disconnectGoogleApiClient() {
-		Wearable.DataApi.removeListener(googleApiClient, dataListener);
+		if(dataListener != null) {
+			Wearable.DataApi.removeListener(googleApiClient, dataListener);
+		}
 		googleApiClient.disconnect();
 	}
 
 	@Override
 	public void connectedGoogleApiClient() {
-		Wearable.DataApi.addListener(googleApiClient, dataListener);
+		if(dataListener != null) {
+			Wearable.DataApi.addListener(googleApiClient, dataListener);
+		}
 	}
 
 	@Override
