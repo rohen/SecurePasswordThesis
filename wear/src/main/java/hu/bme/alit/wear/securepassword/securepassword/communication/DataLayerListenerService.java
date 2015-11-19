@@ -1,4 +1,4 @@
-package hu.bme.alit.wear.common.communication;
+package hu.bme.alit.wear.securepassword.securepassword.communication;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -55,11 +55,23 @@ public class DataLayerListenerService extends WearableListenerService implements
 			if (event.getType() == DataEvent.TYPE_CHANGED) {
 				// DataItem changed
 				DataItem item = event.getDataItem();
-				if (item.getUri().getPath().compareTo(wearSyncHelper.getRequestPath()) == 0) {
+				if (item.getUri().getPath().compareTo(SharedData.REQUEST_PATH_NEW_DATA) == 0) {
 					DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
-					DataMap receivedDataMap = dataMap.get(SharedData.SEND_ADDED_PASSWORD);
+					DataMap receivedDataMap = dataMap.get(SharedData.REQUEST_PATH_NEW_DATA);
 					String[] receivedData = receivedDataMap.getStringArray(SharedData.SEND_DATA);
 					boolean dataChanged = storeHelper.addPassword(receivedData[0], receivedData[1]);
+					if (dataChanged) {
+						//send data to the ListFragment
+						Intent intent = new Intent();
+						intent.setAction(DATA_BROADCAST_ACTION);
+						intent.putExtra(DATA_BROADCAST_CHANGED, true);
+						sendBroadcast(intent);
+					}
+				} else if (item.getUri().getPath().compareTo(SharedData.REQUEST_PATH_REMOVED_DATA) == 0) {
+					DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+					DataMap receivedDataMap = dataMap.get(SharedData.REQUEST_PATH_REMOVED_DATA);
+					String receivedData = receivedDataMap.getString(SharedData.SEND_DATA);
+					boolean dataChanged = storeHelper.removePassword(receivedData);
 					if (dataChanged) {
 						//send data to the ListFragment
 						Intent intent = new Intent();

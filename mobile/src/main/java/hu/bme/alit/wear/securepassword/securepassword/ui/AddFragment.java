@@ -89,7 +89,7 @@ public class AddFragment extends Fragment {
 			String subject = subjectEditText.getText().toString();
 			String password = passwordEditText.getText().toString();
 			if (!subject.equals("") && !password.equals("") && storeHelper.addPassword(subject, password)) {
-				sendPasswordToWear(subject, password);
+				sendMessageToWear(subject, password);
 				showSnackBarMessage(getString(R.string.add_password_store_success));
 				NavigationUtils.navigateToBack(getActivity());
 			} else {
@@ -98,10 +98,10 @@ public class AddFragment extends Fragment {
 		}
 	}
 
-	private void sendPasswordToWear(String subject, String password) {
+	private void sendMessageToWear(String subject, String password) {
 		final WearSyncHelper wearSyncHelper = ((MainActivity) getActivity()).getWearSyncHelper();
 		DataMap newPassword = new DataMap();
 		newPassword.putStringArray(SharedData.SEND_DATA, storeHelper.createStringArrayFromData(subject, password));
-		wearSyncHelper.sendData(SharedData.SEND_ADDED_PASSWORD, newPassword);
+		wearSyncHelper.sendData(SharedData.REQUEST_PATH_NEW_DATA, newPassword);
 	}
 }

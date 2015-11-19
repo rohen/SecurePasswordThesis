@@ -8,11 +8,11 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 
-import hu.bme.alit.wear.common.communication.DataLayerListenerService;
 import hu.bme.alit.wear.common.helper.DefaultStoreHelper;
 import hu.bme.alit.wear.common.helper.StoreHelper;
 import hu.bme.alit.wear.common.utils.NavigationUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
+import hu.bme.alit.wear.securepassword.securepassword.communication.DataLayerListenerService;
 
 public class MainActivity extends Activity {
 
@@ -58,7 +58,6 @@ public class MainActivity extends Activity {
 
 
 	public class DataBroadcastReceiver extends BroadcastReceiver {
-
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent.getAction().equals(DataLayerListenerService.DATA_BROADCAST_ACTION)) {

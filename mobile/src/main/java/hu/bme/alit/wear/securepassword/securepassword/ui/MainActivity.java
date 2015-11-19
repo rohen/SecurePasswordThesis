@@ -14,16 +14,12 @@ import android.view.View;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
-import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.DataItem;
-import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.DataMapItem;
 
 import hu.bme.alit.wear.common.helper.DefaultWearSyncHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
-import hu.bme.alit.wear.securepassword.securepassword.R;
 import hu.bme.alit.wear.common.utils.NavigationUtils;
+import hu.bme.alit.wear.securepassword.securepassword.R;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, DataApi.DataListener,
 		GoogleApiClient.ConnectionCallbacks,
@@ -118,17 +114,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 	@Override
 	public void onDataChanged(DataEventBuffer dataEvents) {
-		for (DataEvent event : dataEvents) {
-			if (event.getType() == DataEvent.TYPE_CHANGED) {
-				// DataItem changed
-				DataItem item = event.getDataItem();
-				if (item.getUri().getPath().compareTo(wearSyncHelper.getRequestPath()) == 0) {
-					DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
-				}
-			} else if (event.getType() == DataEvent.TYPE_DELETED) {
-				// DataItem deleted
-			}
-		}
+//		for (DataEvent event : dataEvents) {
+//			if (event.getType() == DataEvent.TYPE_CHANGED) {
+//				// DataItem changed
+//				DataItem item = event.getDataItem();
+//				if (item.getUri().getPath().compareTo(wearSyncHelper.getRequestPath()) == 0) {
+//					DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+//				}
+//			} else if (event.getType() == DataEvent.TYPE_DELETED) {
+//				// DataItem deleted
+//			}
+//		}
 	}
 
 	@Override

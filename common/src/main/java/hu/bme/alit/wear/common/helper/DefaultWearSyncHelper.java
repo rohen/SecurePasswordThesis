@@ -19,8 +19,6 @@ import java.util.Date;
  */
 public class DefaultWearSyncHelper implements WearSyncHelper {
 
-	private final static String REQUEST_PATH = "/send_data";
-
 	private GoogleApiClient googleApiClient;
 
 	private DataApi.DataListener dataListener;
@@ -56,10 +54,10 @@ public class DefaultWearSyncHelper implements WearSyncHelper {
 	}
 
 	@Override
-	public void sendData(String key, DataMap dataMap) {
+	public void sendData(String requestPath, DataMap dataMap) {
 		dataMap.putLong("time", new Date().getTime());
-		PutDataMapRequest putDataMapReq = PutDataMapRequest.create(REQUEST_PATH);
-		putDataMapReq.getDataMap().putDataMap(key, dataMap);
+		PutDataMapRequest putDataMapReq = PutDataMapRequest.create(requestPath);
+		putDataMapReq.getDataMap().putDataMap(requestPath, dataMap);
 		PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
 		PendingResult<DataApi.DataItemResult> pendingResult =
 				Wearable.DataApi.putDataItem(googleApiClient, putDataReq);
@@ -72,10 +70,5 @@ public class DefaultWearSyncHelper implements WearSyncHelper {
 				}
 			}
 		});
-	}
-
-	@Override
-	public String getRequestPath() {
-		return REQUEST_PATH;
 	}
 }

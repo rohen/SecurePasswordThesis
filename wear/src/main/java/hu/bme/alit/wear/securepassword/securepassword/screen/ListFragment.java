@@ -29,6 +29,8 @@ public class ListFragment extends Fragment {
 
 	private StoreHelper storeHelper;
 
+	private PasswordListAdapter passwordListAdapter;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
@@ -51,15 +53,17 @@ public class ListFragment extends Fragment {
 
 	public void refreshListItems() {
 		subjects = storeHelper.getSubjects();
-
 		if (!subjects.isEmpty()) {
-			listView.setAdapter(new PasswordListAdapter(getActivity(), subjects));
+			passwordListAdapter = new PasswordListAdapter(getActivity(), subjects);
+			listView.setAdapter(passwordListAdapter);
 			listView.setClickListener(getOnClickListener());
 		} else {
 			List<String> emptyString = new ArrayList<>();
 			emptyString.add(getString(R.string.list_passwords_empty_string));
-			listView.setAdapter(new PasswordListAdapter(getActivity(), emptyString));
+			passwordListAdapter = new PasswordListAdapter(getActivity(), emptyString);
+			listView.setAdapter(passwordListAdapter);
 		}
+		passwordListAdapter.notifyDataSetChanged();
 	}
 
 	public WearableListView.ClickListener getOnClickListener() {

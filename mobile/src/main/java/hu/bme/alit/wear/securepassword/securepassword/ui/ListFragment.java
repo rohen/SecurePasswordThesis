@@ -16,15 +16,19 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.wearable.DataMap;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import hu.bme.alit.wear.securepassword.securepassword.R;
+import hu.bme.alit.wear.common.SharedData;
 import hu.bme.alit.wear.common.helper.DefaultStoreHelper;
 import hu.bme.alit.wear.common.helper.DefaultTimerHelper;
 import hu.bme.alit.wear.common.helper.StoreHelper;
 import hu.bme.alit.wear.common.helper.TimerHelper;
+import hu.bme.alit.wear.common.helper.WearSyncHelper;
+import hu.bme.alit.wear.securepassword.securepassword.R;
 
 public class ListFragment extends Fragment implements TimerHelper.TimerCallBack {
 
@@ -36,6 +40,7 @@ public class ListFragment extends Fragment implements TimerHelper.TimerCallBack 
 	private ListView listView;
 	private List<String> subjects;
 	private ProgressBar progressBar;
+	private SubjectAdapter listAdapter;
 
 	private StoreHelper storeHelper;
 
@@ -57,10 +62,10 @@ public class ListFragment extends Fragment implements TimerHelper.TimerCallBack 
 		subjects = storeHelper.getSubjects();
 
 		if (!subjects.isEmpty()) {
-			listView.setAdapter(new SubjectAdapter(getActivity(), android.R.layout.simple_list_item_1, subjects));
+			listAdapter = new SubjectAdapter(getActivity(), android.R.layout.simple_list_item_1, subjects);
+			listView.setAdapter(listAdapter);
 			listView.setOnItemClickListener(getOnItemClickListeners());
 			listView.setOnItemLongClickListener(getOnItemClickListeners());
-			getActivity().registerForContextMenu(listView); //TODO törölni
 		} else {
 			List<String> emptyString = new ArrayList<>();
 			emptyString.add(getString(R.string.list_passwords_empty_string));
@@ -115,8 +120,14 @@ public class ListFragment extends Fragment implements TimerHelper.TimerCallBack 
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				switch (position) {
 					case 0:
-						storeHelper.removePassword(subjects.get(itemPosition));
-						break;
+						String removableSubject = subjects.get(itemPosition);
+						boolean isRemoved = storeHelper.removePassword(removableSubject);
+						if (isRemoved) {
+							subjects.remove(itemPosition);
+							listAdapter.notifyDataSetChanged();
+							sendMessageToWear(removableSubject);
+							break;
+						}
 				}
 				contextDialog.hide();
 			}
@@ -155,5 +166,12 @@ public class ListFragment extends Fragment implements TimerHelper.TimerCallBack 
 		public SubjectAdapter(Context context, int resource, List<String> objects) {
 			super(context, resource, objects);
 		}
+	}
+
+	private void sendMessageToWear(String subject) {
+		final WearSyncHelper wearSyncHelper = ((MainActivity) getActivity()).getWearSyncHelper();
+		DataMap newPassword = new DataMap();
+		newPassword.putString(SharedData.SEND_DATA, subject);
+		wearSyncHelper.sendData(SharedData.REQUEST_PATH_REMOVED_DATA, newPassword);
 	}
 }

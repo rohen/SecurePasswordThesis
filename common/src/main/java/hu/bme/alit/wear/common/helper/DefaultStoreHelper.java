@@ -38,11 +38,12 @@ public class DefaultStoreHelper implements StoreHelper {
 
 	@Override
 	public boolean removePassword(String subject) {
-		return passwordMap.remove(subject) != null && saveData();
+		return passwordMap.remove(subject) == null && saveData();
 	}
 
 	@Override
 	public ArrayList<String> getSubjects() {
+		loadData();
 		Set<String> subjectSet = passwordMap.keySet();
 		return new ArrayList<>(subjectSet);
 	}
