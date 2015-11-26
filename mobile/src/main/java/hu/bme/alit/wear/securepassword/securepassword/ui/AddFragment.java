@@ -57,8 +57,6 @@ public class AddFragment extends Fragment {
 		super.onPause();
 
 		hideKeyboard();
-
-
 	}
 
 	private View.OnClickListener getSubmitButtonOnClickListener() {

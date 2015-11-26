@@ -2,6 +2,10 @@ package hu.bme.alit.wear.securepassword.securepassword.ui;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,16 +21,28 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEventBuffer;
 
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+
 import hu.bme.alit.wear.common.helper.DefaultWearSyncHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
 import hu.bme.alit.wear.common.utils.NavigationUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
+import hu.bme.alit.wear.securepassword.securepassword.communication.DataLayerListenerService;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, DataApi.DataListener,
 		GoogleApiClient.ConnectionCallbacks,
 		GoogleApiClient.OnConnectionFailedListener {
 
 	private WearSyncHelper wearSyncHelper;
+
+	private DataBroadcastReceiver dataBroadcastReceiver;
+
+	private RSAPublicKey rsaPublicKey;
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -42,6 +58,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		toggle.syncState();
 
 		wearSyncHelper = new DefaultWearSyncHelper(this, this, this, this);
+
+		dataBroadcastReceiver = new DataBroadcastReceiver();
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(DataLayerListenerService.DATA_BROADCAST_ACTION);
+		registerReceiver(dataBroadcastReceiver, intentFilter);
 
 		if (savedInstanceState == null) {
 			NavigationUtils.navigateToFragment(this, getContentFrame(), new GreetingsFragment(), GreetingsFragment.FRAGMENT_GREETINGS_TAG, true, false);
@@ -122,17 +143,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 	@Override
 	public void onDataChanged(DataEventBuffer dataEvents) {
-//		for (DataEvent event : dataEvents) {
-//			if (event.getType() == DataEvent.TYPE_CHANGED) {
-//				// DataItem changed
-//				DataItem item = event.getDataItem();
-//				if (item.getUri().getPath().compareTo(wearSyncHelper.getRequestPath()) == 0) {
-//					DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
-//				}
-//			} else if (event.getType() == DataEvent.TYPE_DELETED) {
-//				// DataItem deleted
-//			}
-//		}
 	}
 
 	@Override
@@ -142,5 +152,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 	public WearSyncHelper getWearSyncHelper() {
 		return wearSyncHelper;
+	}
+
+	public class DataBroadcastReceiver extends BroadcastReceiver {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent.getAction().equals(DataLayerListenerService.DATA_BROADCAST_ACTION)) {
+				byte[] rawPublicKey = intent.getExtras().getByteArray(DataLayerListenerService.DATA_BROADCAST_PUBLIC_KEY);
+				try {
+					rsaPublicKey =
+							(RSAPublicKey)KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(rawPublicKey));
+				} catch (InvalidKeySpecException e) {
+					e.printStackTrace();
+				} catch (NoSuchAlgorithmException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public RSAPublicKey getRsaPublicKey() {
+		return rsaPublicKey;
 	}
 }

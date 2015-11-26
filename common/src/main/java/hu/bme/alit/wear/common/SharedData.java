@@ -5,11 +5,21 @@ package hu.bme.alit.wear.common;
  */
 public class SharedData {
 
+	public static final String TAG = "SecurePasswordTag";
+
 	public static final String TEST_SEND_STRING = "test_send_string";
 	public static final String TEST_SEND_DATA = "test_send_data";
 
 	public final static String REQUEST_PATH_NEW_DATA = "/send_data_new";
 	public final static String REQUEST_PATH_REMOVED_DATA = "/send_data_removed";
+	public final static String REQUEST_PATH_PUBLIC_KEY_RECEIVED = "/public_key_received";
 
 	public static final String SEND_DATA = "send_data";
+
+	public static final String CRYPTO_ALIAS = "crypto_alias";
+
+	public static final String DATA_BROADCAST_WEAR_ACTION = "hu.bme.alit.wear.databroadcastreceiver";
+	public static final String DATA_BROADCAST_HANDHELD_ACTION = "hu.bme.alit.handheld.databroadcastreceiver";
+
+	public static final String SHARED_PREFERENCES_PW = "shared_preferences_pw";
 }

@@ -8,15 +8,31 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataMap;
+
+import java.security.interfaces.RSAPublicKey;
+
+import hu.bme.alit.wear.common.SharedData;
 import hu.bme.alit.wear.common.helper.DefaultStoreHelper;
+import hu.bme.alit.wear.common.helper.DefaultWearSyncHelper;
 import hu.bme.alit.wear.common.helper.StoreHelper;
+import hu.bme.alit.wear.common.helper.WearSyncHelper;
+import hu.bme.alit.wear.common.security.CryptoUtils;
 import hu.bme.alit.wear.common.utils.NavigationUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
 import hu.bme.alit.wear.securepassword.securepassword.communication.DataLayerListenerService;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements DataApi.DataListener,
+		GoogleApiClient.ConnectionCallbacks,
+		GoogleApiClient.OnConnectionFailedListener {
 
 	private StoreHelper storeHelper;
+
+	private WearSyncHelper wearSyncHelper;
 
 	private DataBroadcastReceiver dataBroadcastReceiver;
 
@@ -26,6 +42,9 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		storeHelper = new DefaultStoreHelper(this);
+
+		wearSyncHelper = new DefaultWearSyncHelper(this, this, this, this);
+		sendMessageToHandheld();
 
 		dataBroadcastReceiver = new DataBroadcastReceiver();
 		IntentFilter intentFilter = new IntentFilter();
@@ -39,11 +58,13 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		wearSyncHelper.connectGoogleApiClient();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
+		wearSyncHelper.disconnectGoogleApiClient();
 	}
 
 	@Override
@@ -56,6 +77,26 @@ public class MainActivity extends Activity {
 		return storeHelper;
 	}
 
+	@Override
+	public void onConnected(Bundle bundle) {
+		wearSyncHelper.connectedGoogleApiClient();
+	}
+
+	@Override
+	public void onConnectionSuspended(int i) {
+
+	}
+
+	@Override
+	public void onDataChanged(DataEventBuffer dataEventBuffer) {
+
+	}
+
+	@Override
+	public void onConnectionFailed(ConnectionResult connectionResult) {
+
+	}
+
 	public class DataBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -66,5 +107,14 @@ public class MainActivity extends Activity {
 				}
 			}
 		}
+	}
+
+	private void sendMessageToHandheld() {
+		CryptoUtils.createKeyPair(this, SharedData.CRYPTO_ALIAS);
+		RSAPublicKey rsaPublicKey = CryptoUtils.getRSAPublicKey(SharedData.CRYPTO_ALIAS);
+		byte[] keyBytes = rsaPublicKey.getEncoded();
+		DataMap sendPublicKey = new DataMap();
+		sendPublicKey.putByteArray(SharedData.SEND_DATA, keyBytes);
+		wearSyncHelper.sendData(SharedData.REQUEST_PATH_PUBLIC_KEY_RECEIVED, sendPublicKey);
 	}
 }

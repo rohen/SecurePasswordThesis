@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "hu.bme.alit.wear.securepassword.securepassword"
-        minSdkVersion 17
+        minSdkVersion 18
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
