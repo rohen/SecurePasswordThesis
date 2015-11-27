@@ -28,6 +28,7 @@ import hu.bme.alit.wear.common.helper.DefaultTimerHelper;
 import hu.bme.alit.wear.common.helper.StoreHelper;
 import hu.bme.alit.wear.common.helper.TimerHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
+import hu.bme.alit.wear.common.security.RSACryptingUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
 
 public class ListFragment extends Fragment implements TimerHelper.TimerCallBack {
@@ -97,9 +98,14 @@ public class ListFragment extends Fragment implements TimerHelper.TimerCallBack 
 		progressBar = (ProgressBar) layout.findViewById(R.id.progressBar);
 		TextView passwordText = (TextView) layout.findViewById(R.id.password);
 
-		passwordText.setText(storeHelper.getPassword(subjects.get(position)));
+		String password = decryptPassword(storeHelper.getPassword(subjects.get(position)));
+		passwordText.setText(password);
 
 		timerHelper.startTimer();
+	}
+
+	private String decryptPassword(String password) {
+		return RSACryptingUtils.RSADecrypt(password, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS_MASTER));
 	}
 
 	private void createContextMenu(final int itemPosition) {

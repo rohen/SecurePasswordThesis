@@ -111,8 +111,8 @@ public class MainActivity extends Activity implements DataApi.DataListener,
 	}
 
 	private void sendMessageToHandheld() {
-		CryptoUtils.createKeyPair(this, SharedData.CRYPTO_ALIAS);
-		RSAPublicKey rsaPublicKey = RSACryptingUtils.getRSAPublicKey(SharedData.CRYPTO_ALIAS);
+		CryptoUtils.createKeyPair(this, SharedData.CRYPTO_ALIAS_DATA);
+		RSAPublicKey rsaPublicKey = RSACryptingUtils.getRSAPublicKey(SharedData.CRYPTO_ALIAS_DATA);
 		byte[] keyBytes = rsaPublicKey.getEncoded();
 		DataMap sendPublicKey = new DataMap();
 		sendPublicKey.putByteArray(SharedData.SEND_DATA, keyBytes);

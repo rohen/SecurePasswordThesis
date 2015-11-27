@@ -12,11 +12,15 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import java.security.interfaces.RSAPublicKey;
+
 import hu.bme.alit.wear.common.SharedData;
 import hu.bme.alit.wear.common.helper.DefaultStoreHelper;
 import hu.bme.alit.wear.common.helper.DefaultWearSyncHelper;
 import hu.bme.alit.wear.common.helper.StoreHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
+import hu.bme.alit.wear.common.security.CryptoUtils;
+import hu.bme.alit.wear.common.security.RSACryptingUtils;
 import hu.bme.alit.wear.common.security.SharedPreferencesUtils;
 
 /**
@@ -39,6 +43,7 @@ public class WearDataLayerListenerService extends WearableListenerService implem
 
 		wearSyncHelper = new DefaultWearSyncHelper(this, this, this, null);
 
+		sendMessageToHandheld();
 	}
 
 	@Override
@@ -95,6 +100,15 @@ public class WearDataLayerListenerService extends WearableListenerService implem
 	@Override
 	public void onConnectionFailed(ConnectionResult connectionResult) {
 
+	}
+
+	private void sendMessageToHandheld() {
+		CryptoUtils.createKeyPair(this, SharedData.CRYPTO_ALIAS_DATA);
+		RSAPublicKey rsaPublicKey = RSACryptingUtils.getRSAPublicKey(SharedData.CRYPTO_ALIAS_DATA);
+		byte[] keyBytes = rsaPublicKey.getEncoded();
+		DataMap sendPublicKey = new DataMap();
+		sendPublicKey.putByteArray(SharedData.SEND_DATA, keyBytes);
+		wearSyncHelper.sendData(SharedData.REQUEST_PATH_PUBLIC_KEY_RECEIVED, sendPublicKey);
 	}
 
 

@@ -8,12 +8,10 @@ import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
-import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
 import javax.crypto.BadPaddingException;
@@ -44,12 +42,10 @@ public class RSACryptingUtils {
 		return (RSAPublicKey) privateKeyEntry.getCertificate().getPublicKey();
 	}
 
-	public static
-	@Nullable
-	RSAPrivateKey getRSAPrivateKey(String alias) {
-		KeyStore.PrivateKeyEntry privateKeyEntry = null;
+	public static @Nullable PrivateKey getRSAPrivateKey(String alias) {
 		try {
-			privateKeyEntry = (KeyStore.PrivateKeyEntry) CryptoUtils.getKeyStore().getEntry(alias, null);
+			KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) CryptoUtils.getKeyStore().getEntry(alias, null);
+			return privateKeyEntry.getPrivateKey();
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		} catch (CertificateException e) {
@@ -61,23 +57,36 @@ public class RSACryptingUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return (RSAPrivateKey) privateKeyEntry.getPrivateKey();
+		return null;
 	}
 
-	public static String RSAEncrypt(String text, PublicKey publicKey) throws Exception {
+	public static String RSAEncrypt(String text, PublicKey publicKey) {
 		byte[] dataToEncrypt = text.getBytes();
 
-		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding", "AndroidOpenSSL");
-		cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-		byte[] encryptedData = cipher.doFinal(dataToEncrypt);
+		try {
+			Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+			cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+			byte[] encryptedData = cipher.doFinal(dataToEncrypt);
+			return CryptoFormatUtils.convertToString(encryptedData);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
 
-		return CryptoFormatUtils.convertToString(encryptedData);
+		} catch (NoSuchPaddingException e) {
+			e.printStackTrace();
+		} catch (IllegalBlockSizeException e) {
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static String RSADecrypt(String text, PrivateKey privateKey) {
 		byte[] byteText = CryptoFormatUtils.convertToHex(text);
 		try {
-			Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding", "AndroidOpenSSL");
+			Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 			cipher.init(Cipher.DECRYPT_MODE, privateKey);
 			byte[] result = cipher.doFinal(byteText);
 			return new String(result, "UTF8");
@@ -92,8 +101,6 @@ public class RSACryptingUtils {
 		} catch (NoSuchPaddingException e) {
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (NoSuchProviderException e) {
 			e.printStackTrace();
 		}
 		return null;

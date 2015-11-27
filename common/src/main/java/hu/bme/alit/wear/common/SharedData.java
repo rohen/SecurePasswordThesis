@@ -17,13 +17,10 @@ public class SharedData {
 
 	public static final String SEND_DATA = "send_data";
 
-	public static final String CRYPTO_ALIAS = "crypto_alias";
-
-	public static final String DATA_BROADCAST_WEAR_ACTION = "hu.bme.alit.wear.databroadcastreceiver";
-	public static final String DATA_BROADCAST_HANDHELD_ACTION = "hu.bme.alit.handheld.databroadcastreceiver";
+	public static final String CRYPTO_ALIAS_DATA = "crypto_alias_data";
+	public static final String CRYPTO_ALIAS_MASTER = "crypto_alias_master";
 
 	public static final String SHARED_PREFERENCES_PW = "shared_preferences_pw";
-	public static final String SHARED_PREFERENCES_WEAR_PUBLIC_KEY = "shared_preferences_wear_public_key";
 	public static final String SHARED_PREFERENCES_MASTER_PASSWORD_ADDED = "shared_preferences_master_password_added";
 	public static final String SHARED_PREFERENCES_WEAR = "shared_preferences_wear";
 }

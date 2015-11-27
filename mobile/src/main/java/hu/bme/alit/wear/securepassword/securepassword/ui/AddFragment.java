@@ -17,8 +17,7 @@ import hu.bme.alit.wear.common.SharedData;
 import hu.bme.alit.wear.common.helper.DefaultStoreHelper;
 import hu.bme.alit.wear.common.helper.StoreHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
-import hu.bme.alit.wear.common.security.AesCryptingUtils;
-import hu.bme.alit.wear.common.security.SharedPreferencesUtils;
+import hu.bme.alit.wear.common.security.RSACryptingUtils;
 import hu.bme.alit.wear.common.utils.NavigationUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
 
@@ -88,7 +87,8 @@ public class AddFragment extends Fragment {
 
 			String subject = subjectEditText.getText().toString();
 			String password = passwordEditText.getText().toString();
-			if (!subject.equals("") && !password.equals("") && storeHelper.addPassword(subject, password)) {
+			String encryptedPassword = encryptPassword(password);
+			if (!subject.equals("") && encryptedPassword != null && storeHelper.addPassword(subject, encryptedPassword)) {
 				sendMessageToWear(subject, password);
 				showSnackBarMessage(getString(R.string.add_password_store_success));
 				NavigationUtils.navigateToBack(getActivity());
@@ -98,11 +98,15 @@ public class AddFragment extends Fragment {
 		}
 	}
 
+	private String encryptPassword(String password) {
+		return RSACryptingUtils.RSAEncrypt(password, RSACryptingUtils.getRSAPublicKey(SharedData.CRYPTO_ALIAS_MASTER));
+	}
+
 	private void sendMessageToWear(String subject, String password) {
 		final WearSyncHelper wearSyncHelper = ((MainActivity) getActivity()).getWearSyncHelper();
 
-		String masterPassword = SharedPreferencesUtils.getStringData(getActivity(), SharedData.SHARED_PREFERENCES_PW);
-		String encryptedPassword = AesCryptingUtils.encrypt(password, masterPassword);
+//		String masterPassword = SharedPreferencesUtils.getStringData(getActivity(), SharedData.SHARED_PREFERENCES_PW);
+		String encryptedPassword = RSACryptingUtils.RSAEncrypt(password, ((MainActivity) getActivity()).getRsaPublicKey());
 		if (encryptedPassword != null) {
 			DataMap newPassword = new DataMap();
 			newPassword.putStringArray(SharedData.SEND_DATA, storeHelper.createStringArrayFromData(subject, encryptedPassword));
