@@ -31,7 +31,7 @@ import hu.bme.alit.wear.common.helper.DefaultWearSyncHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
 import hu.bme.alit.wear.common.utils.NavigationUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
-import hu.bme.alit.wear.securepassword.securepassword.communication.DataLayerListenerService;
+import hu.bme.alit.wear.securepassword.securepassword.communication.MobileDataLayerListenerService;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, DataApi.DataListener,
 		GoogleApiClient.ConnectionCallbacks,
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 		dataBroadcastReceiver = new DataBroadcastReceiver();
 		IntentFilter intentFilter = new IntentFilter();
-		intentFilter.addAction(DataLayerListenerService.DATA_BROADCAST_ACTION);
+		intentFilter.addAction(MobileDataLayerListenerService.DATA_BROADCAST_ACTION);
 		registerReceiver(dataBroadcastReceiver, intentFilter);
 
 		if (savedInstanceState == null) {
@@ -157,8 +157,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	public class DataBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent.getAction().equals(DataLayerListenerService.DATA_BROADCAST_ACTION)) {
-				byte[] rawPublicKey = intent.getExtras().getByteArray(DataLayerListenerService.DATA_BROADCAST_PUBLIC_KEY);
+			if (intent.getAction().equals(MobileDataLayerListenerService.DATA_BROADCAST_ACTION)) {
+				byte[] rawPublicKey = intent.getExtras().getByteArray(MobileDataLayerListenerService.DATA_BROADCAST_PUBLIC_KEY);
 				try {
 					rsaPublicKey =
 							(RSAPublicKey)KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(rawPublicKey));

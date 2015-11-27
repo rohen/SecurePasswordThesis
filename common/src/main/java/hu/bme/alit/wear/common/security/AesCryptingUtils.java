@@ -1,5 +1,7 @@
 package hu.bme.alit.wear.common.security;
 
+import android.support.annotation.Nullable;
+
 import java.security.SecureRandom;
 
 import javax.crypto.Cipher;
@@ -14,19 +16,30 @@ public class AesCryptingUtils {
 
 	private final static int AES_KEY_SIZE = 128; // the others are 192 and 256 bits
 
-	public static String encrypt(String text, String seed) throws Exception {
-		byte[] rawKey = getRawKey(seed.getBytes());
-		byte[] resultText = encrypt(rawKey, text.getBytes());
-		return CryptoFormatHelper.convertToString(resultText);
+	public static @Nullable String encrypt(String text, String seed) {
+		try {
+			byte[] rawKey = getRawKey(seed.getBytes());
+			byte[] resultText;
+			resultText = encrypt(rawKey, text.getBytes());
+			return CryptoFormatUtils.convertToString(resultText);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
-	public static String decrypt(String text, String seed) throws Exception {
-		byte[] rawKey = getRawKey(seed.getBytes());
-		//convert to hexadecimals due to not lose any data.
-		byte[] byteText = CryptoFormatHelper.convertToHex(text);
-		byte[] result = decrypt(rawKey, byteText);
-		String resumedString = new String(result, "UTF8");
-		return resumedString;
+	public static @Nullable String decrypt(String text, String seed) {
+		try {
+			byte[] rawKey = getRawKey(seed.getBytes());
+			//convert to hexadecimals due to not lose any data.
+			byte[] byteText = CryptoFormatUtils.convertToHex(text);
+			byte[] result = decrypt(rawKey, byteText);
+			String resumedString = new String(result, "UTF8");
+			return resumedString;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	private static byte[] getRawKey(byte[] seed) throws Exception {

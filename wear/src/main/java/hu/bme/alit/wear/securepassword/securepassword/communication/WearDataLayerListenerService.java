@@ -17,11 +17,12 @@ import hu.bme.alit.wear.common.helper.DefaultStoreHelper;
 import hu.bme.alit.wear.common.helper.DefaultWearSyncHelper;
 import hu.bme.alit.wear.common.helper.StoreHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
+import hu.bme.alit.wear.common.security.SharedPreferencesUtils;
 
 /**
  * Created by alit on 18/11/2015.
  */
-public class DataLayerListenerService extends WearableListenerService implements GoogleApiClient.ConnectionCallbacks,
+public class WearDataLayerListenerService extends WearableListenerService implements GoogleApiClient.ConnectionCallbacks,
 		GoogleApiClient.OnConnectionFailedListener {
 
 	public final static String DATA_BROADCAST_ACTION = "hu.bme.alit.databroadcastreceiver";
@@ -79,6 +80,11 @@ public class DataLayerListenerService extends WearableListenerService implements
 						intent.putExtra(DATA_BROADCAST_CHANGED, true);
 						sendBroadcast(intent);
 					}
+				} else if (item.getUri().getPath().compareTo(SharedData.REQUEST_PATH_MASTER_PASSWORD) == 0) {
+					DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+					DataMap receivedDataMap = dataMap.get(SharedData.REQUEST_PATH_MASTER_PASSWORD);
+					String receivedData = receivedDataMap.getString(SharedData.SEND_DATA);
+					SharedPreferencesUtils.putStringData(WearDataLayerListenerService.this, SharedData.SHARED_PREFERENCES_WEAR, SharedData.SHARED_PREFERENCES_PW, receivedData);
 				}
 			} else if (event.getType() == DataEvent.TYPE_DELETED) {
 				// DataItem deleted

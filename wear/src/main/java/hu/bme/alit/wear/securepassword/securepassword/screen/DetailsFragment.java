@@ -7,7 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import hu.bme.alit.wear.common.SharedData;
 import hu.bme.alit.wear.common.helper.StoreHelper;
+import hu.bme.alit.wear.common.security.AesCryptingUtils;
+import hu.bme.alit.wear.common.security.RSACryptingUtils;
+import hu.bme.alit.wear.common.security.SharedPreferencesUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
 
 /**
@@ -41,7 +45,10 @@ public class DetailsFragment extends Fragment {
 
 		storeHelper = ((MainActivity)getActivity()).getStoreHelper();
 
-		String password = storeHelper.getPassword(selectedSubject);
+		String encryptedPassword = storeHelper.getPassword(selectedSubject);
+		String encryptedMasterPassword = SharedPreferencesUtils.getStringData(getActivity(), SharedData.SHARED_PREFERENCES_WEAR, SharedData.SHARED_PREFERENCES_PW);
+		String decryptedMasterPassword = RSACryptingUtils.RSADecrypt(encryptedMasterPassword, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS));
+		String password = AesCryptingUtils.decrypt(encryptedPassword, decryptedMasterPassword);
 
 		passwordText.setText(password);
 

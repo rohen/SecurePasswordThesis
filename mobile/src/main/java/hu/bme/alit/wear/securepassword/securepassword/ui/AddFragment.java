@@ -17,8 +17,10 @@ import hu.bme.alit.wear.common.SharedData;
 import hu.bme.alit.wear.common.helper.DefaultStoreHelper;
 import hu.bme.alit.wear.common.helper.StoreHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
-import hu.bme.alit.wear.securepassword.securepassword.R;
+import hu.bme.alit.wear.common.security.AesCryptingUtils;
+import hu.bme.alit.wear.common.security.SharedPreferencesUtils;
 import hu.bme.alit.wear.common.utils.NavigationUtils;
+import hu.bme.alit.wear.securepassword.securepassword.R;
 
 public class AddFragment extends Fragment {
 
@@ -98,8 +100,13 @@ public class AddFragment extends Fragment {
 
 	private void sendMessageToWear(String subject, String password) {
 		final WearSyncHelper wearSyncHelper = ((MainActivity) getActivity()).getWearSyncHelper();
-		DataMap newPassword = new DataMap();
-		newPassword.putStringArray(SharedData.SEND_DATA, storeHelper.createStringArrayFromData(subject, password));
-		wearSyncHelper.sendData(SharedData.REQUEST_PATH_NEW_DATA, newPassword);
+
+		String masterPassword = SharedPreferencesUtils.getStringData(getActivity(), SharedData.SHARED_PREFERENCES_PW);
+		String encryptedPassword = AesCryptingUtils.encrypt(password, masterPassword);
+		if (encryptedPassword != null) {
+			DataMap newPassword = new DataMap();
+			newPassword.putStringArray(SharedData.SEND_DATA, storeHelper.createStringArrayFromData(subject, encryptedPassword));
+			wearSyncHelper.sendData(SharedData.REQUEST_PATH_NEW_DATA, newPassword);
+		}
 	}
 }

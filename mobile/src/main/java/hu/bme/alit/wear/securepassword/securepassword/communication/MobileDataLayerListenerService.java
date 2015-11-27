@@ -13,15 +13,13 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.WearableListenerService;
 
 import hu.bme.alit.wear.common.SharedData;
-import hu.bme.alit.wear.common.helper.DefaultStoreHelper;
 import hu.bme.alit.wear.common.helper.DefaultWearSyncHelper;
-import hu.bme.alit.wear.common.helper.StoreHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
 
 /**
  * Created by alit on 18/11/2015.
  */
-public class DataLayerListenerService extends WearableListenerService implements GoogleApiClient.ConnectionCallbacks,
+public class MobileDataLayerListenerService extends WearableListenerService implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
     public final static String DATA_BROADCAST_ACTION = "hu.bme.alit.databroadcastreceiver";

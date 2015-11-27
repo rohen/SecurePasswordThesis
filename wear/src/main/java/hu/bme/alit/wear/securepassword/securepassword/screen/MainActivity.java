@@ -22,9 +22,10 @@ import hu.bme.alit.wear.common.helper.DefaultWearSyncHelper;
 import hu.bme.alit.wear.common.helper.StoreHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
 import hu.bme.alit.wear.common.security.CryptoUtils;
+import hu.bme.alit.wear.common.security.RSACryptingUtils;
 import hu.bme.alit.wear.common.utils.NavigationUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
-import hu.bme.alit.wear.securepassword.securepassword.communication.DataLayerListenerService;
+import hu.bme.alit.wear.securepassword.securepassword.communication.WearDataLayerListenerService;
 
 public class MainActivity extends Activity implements DataApi.DataListener,
 		GoogleApiClient.ConnectionCallbacks,
@@ -48,7 +49,7 @@ public class MainActivity extends Activity implements DataApi.DataListener,
 
 		dataBroadcastReceiver = new DataBroadcastReceiver();
 		IntentFilter intentFilter = new IntentFilter();
-		intentFilter.addAction(DataLayerListenerService.DATA_BROADCAST_ACTION);
+		intentFilter.addAction(WearDataLayerListenerService.DATA_BROADCAST_ACTION);
 		registerReceiver(dataBroadcastReceiver, intentFilter);
 
 		View contentFrame = findViewById(R.id.content_frame);
@@ -100,7 +101,7 @@ public class MainActivity extends Activity implements DataApi.DataListener,
 	public class DataBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent.getAction().equals(DataLayerListenerService.DATA_BROADCAST_ACTION)) {
+			if (intent.getAction().equals(WearDataLayerListenerService.DATA_BROADCAST_ACTION)) {
 				ListFragment listFragment = (ListFragment) getFragmentManager().findFragmentByTag(ListFragment.FRAGMENT_LIST_PASSWORDS_TAG);
 				if (listFragment != null) {
 					listFragment.refreshListItems();
@@ -111,7 +112,7 @@ public class MainActivity extends Activity implements DataApi.DataListener,
 
 	private void sendMessageToHandheld() {
 		CryptoUtils.createKeyPair(this, SharedData.CRYPTO_ALIAS);
-		RSAPublicKey rsaPublicKey = CryptoUtils.getRSAPublicKey(SharedData.CRYPTO_ALIAS);
+		RSAPublicKey rsaPublicKey = RSACryptingUtils.getRSAPublicKey(SharedData.CRYPTO_ALIAS);
 		byte[] keyBytes = rsaPublicKey.getEncoded();
 		DataMap sendPublicKey = new DataMap();
 		sendPublicKey.putByteArray(SharedData.SEND_DATA, keyBytes);

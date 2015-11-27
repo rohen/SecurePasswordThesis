@@ -3,7 +3,7 @@ package hu.bme.alit.wear.common.security;
 /**
  * Helper to format the text to byte and vice versa.
  */
-public class CryptoFormatHelper {
+public class CryptoFormatUtils {
 
 	private final static String HEX = "0123456789ABCDEF";
 

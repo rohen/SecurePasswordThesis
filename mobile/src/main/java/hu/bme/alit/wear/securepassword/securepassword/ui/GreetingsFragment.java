@@ -11,8 +11,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.google.android.gms.wearable.DataMap;
+
 import hu.bme.alit.wear.common.SharedData;
-import hu.bme.alit.wear.common.security.CryptoUtils;
+import hu.bme.alit.wear.common.helper.WearSyncHelper;
+import hu.bme.alit.wear.common.security.RSACryptingUtils;
 import hu.bme.alit.wear.common.security.SharedPreferencesUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
 
@@ -26,7 +29,7 @@ public class GreetingsFragment extends Fragment {
 		// Inflate the layout for this fragment
 		View viewContainer = inflater.inflate(R.layout.fragment_greetings, container, false);
 
-		boolean isPasswordAdded = false;
+		boolean isPasswordAdded = SharedPreferencesUtils.getBooleanData(getActivity(), SharedData.SHARED_PREFERENCES_MASTER_PASSWORD_ADDED);
 		if (!isPasswordAdded) {
 			createContextMenu();
 		}
@@ -50,16 +53,28 @@ public class GreetingsFragment extends Fragment {
 				String password = addPasswordEditText.getText().toString();
 				if (password.length() > 3) {
 					try {
-						String encryptedPassword = CryptoUtils.RSAEncrypt(password, ((MainActivity) getActivity()).getRsaPublicKey());
-						if(!encryptedPassword.equals("") ) {
-							SharedPreferencesUtils.putStringData(getActivity(), SharedData.SHARED_PREFERENCES_PW, encryptedPassword);
-						}
+						String encryptedMasterPassword = RSACryptingUtils.RSAEncrypt(password, ((MainActivity) getActivity()).getRsaPublicKey());
+						SharedPreferencesUtils.putStringData(getActivity(), SharedData.SHARED_PREFERENCES_PW, encryptedMasterPassword);
+						sendMasterPasswordToWear(encryptedMasterPassword);
 					} catch (Exception e) {
 						e.printStackTrace();
+						return;
 					}
+					SharedPreferencesUtils.putBooleanData(getActivity(), SharedData.SHARED_PREFERENCES_MASTER_PASSWORD_ADDED, true);
 					contextDialog.hide();
 				}
 			}
 		});
+	}
+
+	private void sendMasterPasswordToWear(String encryptedMasterPassword) {
+		final WearSyncHelper wearSyncHelper = ((MainActivity) getActivity()).getWearSyncHelper();
+
+		String masterPassword = SharedPreferencesUtils.getStringData(getActivity(), SharedData.SHARED_PREFERENCES_PW);
+		if (masterPassword != null) {
+			DataMap sendMasterPassword = new DataMap();
+			sendMasterPassword.putString(SharedData.SEND_DATA, encryptedMasterPassword);
+			wearSyncHelper.sendData(SharedData.REQUEST_PATH_MASTER_PASSWORD, sendMasterPassword);
+		}
 	}
 }

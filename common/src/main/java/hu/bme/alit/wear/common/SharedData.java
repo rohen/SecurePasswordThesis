@@ -13,6 +13,7 @@ public class SharedData {
 	public final static String REQUEST_PATH_NEW_DATA = "/send_data_new";
 	public final static String REQUEST_PATH_REMOVED_DATA = "/send_data_removed";
 	public final static String REQUEST_PATH_PUBLIC_KEY_RECEIVED = "/public_key_received";
+	public static final String REQUEST_PATH_MASTER_PASSWORD = "/send_master_password";
 
 	public static final String SEND_DATA = "send_data";
 
@@ -22,4 +23,7 @@ public class SharedData {
 	public static final String DATA_BROADCAST_HANDHELD_ACTION = "hu.bme.alit.handheld.databroadcastreceiver";
 
 	public static final String SHARED_PREFERENCES_PW = "shared_preferences_pw";
+	public static final String SHARED_PREFERENCES_WEAR_PUBLIC_KEY = "shared_preferences_wear_public_key";
+	public static final String SHARED_PREFERENCES_MASTER_PASSWORD_ADDED = "shared_preferences_master_password_added";
+	public static final String SHARED_PREFERENCES_WEAR = "shared_preferences_wear";
 }
