@@ -1,2 +1,2 @@
 include ':mobile', ':wear', ':common', ':PatternLock'
-project(':PatternLock').projectDir = new File('libs/PatternLock/library')
+project(':PatternLock').projectDir = new File('libs/PatternLock')

@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +53,7 @@ public class ListFragment extends Fragment implements TimerHelper.TimerCallBack 
 		super.onCreate(savedInstanceState);
 
 		storeHelper = new DefaultStoreHelper(getActivity());
+		setTitle();
 	}
 
 	@Override
@@ -179,5 +181,9 @@ public class ListFragment extends Fragment implements TimerHelper.TimerCallBack 
 		DataMap newPassword = new DataMap();
 		newPassword.putString(SharedData.SEND_DATA, subject);
 		wearSyncHelper.sendData(SharedData.REQUEST_PATH_REMOVED_DATA, newPassword);
+	}
+
+	private void setTitle() {
+		((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.list_passwords_fragment_title);
 	}
 }

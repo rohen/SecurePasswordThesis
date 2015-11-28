@@ -3,7 +3,9 @@ package hu.bme.alit.wear.securepassword.securepassword.ui;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,21 +22,29 @@ import hu.bme.alit.wear.common.security.RSACryptingUtils;
 import hu.bme.alit.wear.common.utils.PreferenceContract;
 import hu.bme.alit.wear.common.utils.PreferenceUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
+import hu.bme.alit.wear.securepassword.securepassword.pattern.SetPatternActivity;
 
 public class GreetingsFragment extends Fragment {
 
 	public final static String FRAGMENT_GREETINGS_TAG = "fragment_greetings_tag";
 
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		setTitle();
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
 		View viewContainer = inflater.inflate(R.layout.fragment_greetings, container, false);
-//		boolean isPasswordAdded = SharedPreferencesUtils.getBooleanData(getActivity(), SharedData.SHARED_PREFERENCES_MASTER_PASSWORD_ADDED);
-//		if (!isPasswordAdded) {
-//			getActivity().startActivity(new Intent(getActivity(), SetPatternActivity.class));
+		boolean isPasswordAdded = PreferenceUtils.getBoolean(PreferenceContract.MASTER_PASSWORD_ADDED, false, getActivity());
+		if (!isPasswordAdded) {
+			getActivity().startActivity(new Intent(getActivity(), SetPatternActivity.class));
 //			createContextMenu();
-//		}
+		}
 		return viewContainer;
 	}
 
@@ -79,5 +89,9 @@ public class GreetingsFragment extends Fragment {
 			sendMasterPassword.putString(SharedData.SEND_DATA, encryptedMasterPassword);
 			wearSyncHelper.sendData(SharedData.REQUEST_PATH_MASTER_PASSWORD, sendMasterPassword);
 		}
+	}
+
+	private void setTitle() {
+		((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.greetings_fragment_title);
 	}
 }

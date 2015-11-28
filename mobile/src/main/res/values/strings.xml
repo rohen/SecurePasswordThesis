@@ -19,5 +19,8 @@
 	<string name="master_password_title">Add master password</string>
 	<string name="set_pattern_title">Set pattern</string>
 	<string name="confirm_pattern_title">Confirm pattern</string>
+	<string name="list_passwords_fragment_title">List passwords</string>
+	<string name="add_password_fragment_title">Add password</string>
+	<string name="greetings_fragment_title">Secure Password</string>
 
 </resources>

@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +38,8 @@ public class AddFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 
 		storeHelper = new DefaultStoreHelper(getActivity());
+
+		setTitle();
 	}
 
 	@Override
@@ -119,5 +122,9 @@ public class AddFragment extends Fragment {
 			newPassword.putStringArray(SharedData.SEND_DATA, storeHelper.createStringArrayFromData(subject, encryptedPassword));
 			wearSyncHelper.sendData(SharedData.REQUEST_PATH_NEW_DATA, newPassword);
 		}
+	}
+
+	private void setTitle() {
+		((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.add_password_fragment_title);
 	}
 }
