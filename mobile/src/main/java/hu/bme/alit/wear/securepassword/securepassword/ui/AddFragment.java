@@ -27,6 +27,7 @@ public class AddFragment extends Fragment {
 
 	private EditText subjectEditText;
 	private EditText passwordEditText;
+	private EditText passwordAgainEditText;
 	private Button submitButton;
 
 	private StoreHelper storeHelper;
@@ -46,6 +47,7 @@ public class AddFragment extends Fragment {
 
 		subjectEditText = (EditText) viewContainer.findViewById(R.id.input_subject);
 		passwordEditText = (EditText) viewContainer.findViewById(R.id.input_value);
+		passwordAgainEditText = (EditText) viewContainer.findViewById(R.id.input_value_again);
 		submitButton = (Button) viewContainer.findViewById(R.id.submitButton);
 
 		submitButton.setOnClickListener(getSubmitButtonOnClickListener());
@@ -87,6 +89,11 @@ public class AddFragment extends Fragment {
 
 			String subject = subjectEditText.getText().toString();
 			String password = passwordEditText.getText().toString();
+			String passwordAgain = passwordAgainEditText.getText().toString();
+			if(!password.equals(passwordAgain)) {
+				showSnackBarMessage(getString(R.string.add_password_not_equal));
+				return;
+			}
 			String encryptedPassword = encryptPassword(password);
 			if (!subject.equals("") && encryptedPassword != null && storeHelper.addPassword(subject, encryptedPassword)) {
 				sendMessageToWear(subject, password);

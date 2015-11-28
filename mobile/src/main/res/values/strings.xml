@@ -11,10 +11,13 @@
 	<string name="add_password_save_button">SAVE</string>
 	<string name="add_password_store_success">Password is stored in the database.</string>
 	<string name="add_password_store_failed">Password cannot be saved/the subject already exists.</string>
+	<string name="add_password_again_value">Password again</string>
+	<string name="add_password_not_equal">Passwords are not equal!</string>
 
 	<string name="greetings_text">Please use the navigation drawer to add new password to the password list.</string>
 	<string name="greetings_fragment_context_ok_button">OK</string>
 	<string name="master_password_title">Add master password</string>
 	<string name="set_pattern_title">Set pattern</string>
 	<string name="confirm_pattern_title">Confirm pattern</string>
+
 </resources>
