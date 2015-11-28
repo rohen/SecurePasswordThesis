@@ -21,6 +21,20 @@
 			</intent-filter>
 		</activity>
 
+		<activity
+			android:name=".pattern.SetPatternActivity"
+			android:label="@string/set_pattern_title"
+			android:launchMode="singleTop">
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value=".ui.MainActivity" />
+		</activity>
+
+		<activity
+			android:name=".pattern.ConfirmPatternActivity"
+			android:label="@string/confirm_pattern_title"
+			android:launchMode="singleTop" />
+
 		<service android:name=".communication.MobileDataLayerListenerService">
 			<intent-filter>
 				<action android:name="com.google.android.gms.wearable.BIND_LISTENER"/>

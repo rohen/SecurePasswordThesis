@@ -21,7 +21,8 @@ import hu.bme.alit.wear.common.helper.StoreHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
 import hu.bme.alit.wear.common.security.CryptoUtils;
 import hu.bme.alit.wear.common.security.RSACryptingUtils;
-import hu.bme.alit.wear.common.security.SharedPreferencesUtils;
+import hu.bme.alit.wear.common.utils.PreferenceContract;
+import hu.bme.alit.wear.common.utils.PreferenceUtils;
 
 /**
  * Created by alit on 18/11/2015.
@@ -89,7 +90,7 @@ public class WearDataLayerListenerService extends WearableListenerService implem
 					DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
 					DataMap receivedDataMap = dataMap.get(SharedData.REQUEST_PATH_MASTER_PASSWORD);
 					String receivedData = receivedDataMap.getString(SharedData.SEND_DATA);
-					SharedPreferencesUtils.putStringData(WearDataLayerListenerService.this, SharedData.SHARED_PREFERENCES_WEAR, SharedData.SHARED_PREFERENCES_PW, receivedData);
+					PreferenceUtils.putString(PreferenceContract.MASTER_PASSWORD, receivedData, WearDataLayerListenerService.this);
 				}
 			} else if (event.getType() == DataEvent.TYPE_DELETED) {
 				// DataItem deleted

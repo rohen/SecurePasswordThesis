@@ -32,6 +32,7 @@ import hu.bme.alit.wear.common.helper.WearSyncHelper;
 import hu.bme.alit.wear.common.utils.NavigationUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
 import hu.bme.alit.wear.securepassword.securepassword.communication.MobileDataLayerListenerService;
+import hu.bme.alit.wear.securepassword.securepassword.pattern.PatternLockUtils;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, DataApi.DataListener,
 		GoogleApiClient.ConnectionCallbacks,
@@ -64,6 +65,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		intentFilter.addAction(MobileDataLayerListenerService.DATA_BROADCAST_ACTION);
 		registerReceiver(dataBroadcastReceiver, intentFilter);
 
+//		boolean isPasswordAdded = SharedPreferencesUtils.getBooleanData(this, SharedData.SHARED_PREFERENCES_MASTER_PASSWORD_ADDED);
+//		if (!isPasswordAdded) {
+//			this.startActivity(new Intent(this, SetPatternActivity.class));
+//		} else
 		if (savedInstanceState == null) {
 			NavigationUtils.navigateToFragment(this, getContentFrame(), new GreetingsFragment(), GreetingsFragment.FRAGMENT_GREETINGS_TAG, true, false);
 		}
@@ -173,5 +178,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 	public RSAPublicKey getRsaPublicKey() {
 		return rsaPublicKey;
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (PatternLockUtils.checkConfirmPatternResult(this, requestCode, resultCode)) {
+			NavigationUtils.navigateToFragment(this, getContentFrame(), new GreetingsFragment(), GreetingsFragment.FRAGMENT_GREETINGS_TAG, true, false);
+		} else {
+			super.onActivityResult(requestCode, resultCode, data);
+		}
 	}
 }

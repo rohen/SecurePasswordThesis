@@ -19,8 +19,4 @@ public class SharedData {
 
 	public static final String CRYPTO_ALIAS_DATA = "crypto_alias_data";
 	public static final String CRYPTO_ALIAS_MASTER = "crypto_alias_master";
-
-	public static final String SHARED_PREFERENCES_PW = "shared_preferences_pw";
-	public static final String SHARED_PREFERENCES_MASTER_PASSWORD_ADDED = "shared_preferences_master_password_added";
-	public static final String SHARED_PREFERENCES_WEAR = "shared_preferences_wear";
 }

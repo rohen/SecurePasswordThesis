@@ -15,4 +15,6 @@
 	<string name="greetings_text">Please use the navigation drawer to add new password to the password list.</string>
 	<string name="greetings_fragment_context_ok_button">OK</string>
 	<string name="master_password_title">Add master password</string>
+	<string name="set_pattern_title">Set pattern</string>
+	<string name="confirm_pattern_title">Confirm pattern</string>
 </resources>
