@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<color name="regularColor">@android:color/holo_blue_dark</color>
+	<color name="successColor">@android:color/holo_green_dark</color>
+	<color name="pathColor">@android:color/holo_blue_light</color>
+	<color name="errorColor">@android:color/holo_red_light</color>
+</resources>

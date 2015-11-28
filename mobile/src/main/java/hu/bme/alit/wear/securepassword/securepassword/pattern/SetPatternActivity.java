@@ -5,10 +5,13 @@
 
 package hu.bme.alit.wear.securepassword.securepassword.pattern;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import java.util.List;
 
+import hu.bme.alit.wear.securepassword.securepassword.ui.MainActivity;
+import me.zhanghai.patternlock.PatternUtils;
 import me.zhanghai.patternlock.PatternView;
 
 public class SetPatternActivity extends me.zhanghai.patternlock.SetPatternActivity {
@@ -22,6 +25,9 @@ public class SetPatternActivity extends me.zhanghai.patternlock.SetPatternActivi
 
 	@Override
 	protected void onSetPattern(List<PatternView.Cell> pattern) {
-		PatternLockUtils.setPattern(pattern, this);
+		Intent resultIntent = new Intent();
+		resultIntent.putExtra(MainActivity.RESULT_CREATE_PATTERN_DATA, PatternUtils.patternToBytes(pattern));
+		setResult(MainActivity.RESULT_CREATE_PATTERN_CODE, resultIntent);
+		finish();
 	}
 }

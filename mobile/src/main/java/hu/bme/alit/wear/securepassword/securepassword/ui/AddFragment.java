@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -109,14 +110,14 @@ public class AddFragment extends Fragment {
 	}
 
 	private String encryptPassword(String password) {
-		return RSACryptingUtils.RSAEncrypt(password, RSACryptingUtils.getRSAPublicKey(SharedData.CRYPTO_ALIAS_MASTER));
+		return RSACryptingUtils.RSAEncrypt(password, RSACryptingUtils.getRSAPublicKey(SharedData.CRYPTO_ALIAS_MOBILE));
 	}
 
 	private void sendMessageToWear(String subject, String password) {
 		final WearSyncHelper wearSyncHelper = ((MainActivity) getActivity()).getWearSyncHelper();
 
 //		String masterPassword = SharedPreferencesUtils.getStringData(getActivity(), SharedData.SHARED_PREFERENCES_PW);
-		String encryptedPassword = RSACryptingUtils.RSAEncrypt(password, ((MainActivity) getActivity()).getRsaPublicKey());
+		String encryptedPassword = RSACryptingUtils.RSAEncrypt(password, ((MainActivity) getActivity()).getRsaPublicKeyWear());
 		if (encryptedPassword != null) {
 			DataMap newPassword = new DataMap();
 			newPassword.putStringArray(SharedData.SEND_DATA, storeHelper.createStringArrayFromData(subject, encryptedPassword));
@@ -125,6 +126,9 @@ public class AddFragment extends Fragment {
 	}
 
 	private void setTitle() {
-		((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.add_password_fragment_title);
+		ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+		if (actionBar != null) {
+			actionBar.setTitle(R.string.add_password_fragment_title);
+		}
 	}
 }

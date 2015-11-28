@@ -20,6 +20,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataMap;
 
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -27,22 +28,31 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
+import hu.bme.alit.wear.common.SharedData;
 import hu.bme.alit.wear.common.helper.DefaultWearSyncHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
+import hu.bme.alit.wear.common.security.CryptoUtils;
 import hu.bme.alit.wear.common.utils.NavigationUtils;
+import hu.bme.alit.wear.common.utils.PreferenceContract;
+import hu.bme.alit.wear.common.utils.PreferenceUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
 import hu.bme.alit.wear.securepassword.securepassword.communication.MobileDataLayerListenerService;
 import hu.bme.alit.wear.securepassword.securepassword.pattern.PatternLockUtils;
+import hu.bme.alit.wear.securepassword.securepassword.pattern.SetPatternActivity;
+import me.zhanghai.patternlock.PatternUtils;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, DataApi.DataListener,
 		GoogleApiClient.ConnectionCallbacks,
 		GoogleApiClient.OnConnectionFailedListener {
 
+	public static final int RESULT_CREATE_PATTERN_CODE = 365;
+	public static final String RESULT_CREATE_PATTERN_DATA = "result_create_pattern_data";
+
 	private WearSyncHelper wearSyncHelper;
 
 	private DataBroadcastReceiver dataBroadcastReceiver;
 
-	private RSAPublicKey rsaPublicKey;
+	private RSAPublicKey rsaPublicKeyWear;
 
 
 	@Override
@@ -65,11 +75,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		intentFilter.addAction(MobileDataLayerListenerService.DATA_BROADCAST_ACTION);
 		registerReceiver(dataBroadcastReceiver, intentFilter);
 
-//		boolean isPasswordAdded = SharedPreferencesUtils.getBooleanData(this, SharedData.SHARED_PREFERENCES_MASTER_PASSWORD_ADDED);
-//		if (!isPasswordAdded) {
-//			this.startActivity(new Intent(this, SetPatternActivity.class));
-//		} else
-		if (savedInstanceState == null) {
+		boolean isPasswordAdded = PreferenceUtils.getBoolean(PreferenceContract.PATTERN_ADDED, false, this);
+		if (!isPasswordAdded) {
+			this.startActivityForResult(new Intent(this, SetPatternActivity.class), RESULT_CREATE_PATTERN_CODE);
+		} else if (savedInstanceState == null) {
 			NavigationUtils.navigateToFragment(this, getContentFrame(), new GreetingsFragment(), GreetingsFragment.FRAGMENT_GREETINGS_TAG, true, false);
 		}
 
@@ -165,8 +174,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			if (intent.getAction().equals(MobileDataLayerListenerService.DATA_BROADCAST_ACTION)) {
 				byte[] rawPublicKey = intent.getExtras().getByteArray(MobileDataLayerListenerService.DATA_BROADCAST_PUBLIC_KEY);
 				try {
-					rsaPublicKey =
-							(RSAPublicKey)KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(rawPublicKey));
+					rsaPublicKeyWear =
+							(RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(rawPublicKey));
 				} catch (InvalidKeySpecException e) {
 					e.printStackTrace();
 				} catch (NoSuchAlgorithmException e) {
@@ -176,16 +185,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		}
 	}
 
-	public RSAPublicKey getRsaPublicKey() {
-		return rsaPublicKey;
+	public RSAPublicKey getRsaPublicKeyWear() {
+		return rsaPublicKeyWear;
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (PatternLockUtils.checkConfirmPatternResult(this, requestCode, resultCode)) {
+		if (resultCode == RESULT_CREATE_PATTERN_CODE) {
+			String patternString = PatternUtils.bytesToString(data.getByteArrayExtra(RESULT_CREATE_PATTERN_DATA));
+			PatternLockUtils.savePatternEncrypted(this, patternString, SharedData.CRYPTO_ALIAS_MOBILE);
+			sendPatternEncrypted(patternString, SharedData.CRYPTO_ALIAS_WEAR);
+			PreferenceUtils.putBoolean(PreferenceContract.PATTERN_ADDED, true, this);
 			NavigationUtils.navigateToFragment(this, getContentFrame(), new GreetingsFragment(), GreetingsFragment.FRAGMENT_GREETINGS_TAG, true, false);
 		} else {
 			super.onActivityResult(requestCode, resultCode, data);
 		}
 	}
+
+	private void sendPatternEncrypted(String patternString, String alias) {
+		CryptoUtils.createKeyPair(this, alias);
+		String encryptedPattern = PatternLockUtils.encryptPattern(this, patternString, alias, rsaPublicKeyWear);
+		if (encryptedPattern != null) {
+			DataMap sendMasterPassword = new DataMap();
+			sendMasterPassword.putString(SharedData.SEND_DATA, encryptedPattern);
+			wearSyncHelper.sendData(SharedData.REQUEST_PATH_PATTERN, sendMasterPassword);
+		}
+	}
+
+
 }

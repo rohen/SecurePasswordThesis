@@ -1,10 +1,13 @@
 package hu.bme.alit.wear.securepassword.securepassword.ui;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +34,7 @@ import hu.bme.alit.wear.common.helper.TimerHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
 import hu.bme.alit.wear.common.security.RSACryptingUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
+import hu.bme.alit.wear.securepassword.securepassword.pattern.PatternLockUtils;
 
 public class ListFragment extends Fragment implements TimerHelper.TimerCallBack {
 
@@ -45,6 +49,8 @@ public class ListFragment extends Fragment implements TimerHelper.TimerCallBack 
 	private SubjectAdapter listAdapter;
 
 	private StoreHelper storeHelper;
+
+	private int clickedPosition;
 
 	private Dialog showPasswordDialog;
 
@@ -107,7 +113,7 @@ public class ListFragment extends Fragment implements TimerHelper.TimerCallBack 
 	}
 
 	private String decryptPassword(String password) {
-		return RSACryptingUtils.RSADecrypt(password, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS_MASTER));
+		return RSACryptingUtils.RSADecrypt(password, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS_MOBILE));
 	}
 
 	private void createContextMenu(final int itemPosition) {
@@ -160,7 +166,8 @@ public class ListFragment extends Fragment implements TimerHelper.TimerCallBack 
 
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			createDialog(position);
+			PatternLockUtils.confirmPattern(getActivity(), ListFragment.this);
+			clickedPosition = position;
 		}
 
 		@Override
@@ -170,9 +177,12 @@ public class ListFragment extends Fragment implements TimerHelper.TimerCallBack 
 		}
 	}
 
-	private class SubjectAdapter extends ArrayAdapter<String> {
-		public SubjectAdapter(Context context, int resource, List<String> objects) {
-			super(context, resource, objects);
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == Activity.RESULT_OK) {
+			createDialog(clickedPosition);
+		} else {
+			super.onActivityResult(requestCode, resultCode, data);
 		}
 	}
 
@@ -184,6 +194,15 @@ public class ListFragment extends Fragment implements TimerHelper.TimerCallBack 
 	}
 
 	private void setTitle() {
-		((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.list_passwords_fragment_title);
+		ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+		if (actionBar != null) {
+			actionBar.setTitle(R.string.list_passwords_fragment_title);
+		}
+	}
+
+	private class SubjectAdapter extends ArrayAdapter<String> {
+		public SubjectAdapter(Context context, int resource, List<String> objects) {
+			super(context, resource, objects);
+		}
 	}
 }

@@ -86,11 +86,11 @@ public class WearDataLayerListenerService extends WearableListenerService implem
 						intent.putExtra(DATA_BROADCAST_CHANGED, true);
 						sendBroadcast(intent);
 					}
-				} else if (item.getUri().getPath().compareTo(SharedData.REQUEST_PATH_MASTER_PASSWORD) == 0) {
+				} else if (item.getUri().getPath().compareTo(SharedData.REQUEST_PATH_PATTERN) == 0) {
 					DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
-					DataMap receivedDataMap = dataMap.get(SharedData.REQUEST_PATH_MASTER_PASSWORD);
+					DataMap receivedDataMap = dataMap.get(SharedData.REQUEST_PATH_PATTERN);
 					String receivedData = receivedDataMap.getString(SharedData.SEND_DATA);
-					PreferenceUtils.putString(PreferenceContract.MASTER_PASSWORD, receivedData, WearDataLayerListenerService.this);
+					PreferenceUtils.putString(PreferenceContract.KEY_PATTERN, receivedData, WearDataLayerListenerService.this);
 				}
 			} else if (event.getType() == DataEvent.TYPE_DELETED) {
 				// DataItem deleted
@@ -104,8 +104,8 @@ public class WearDataLayerListenerService extends WearableListenerService implem
 	}
 
 	private void sendMessageToHandheld() {
-		CryptoUtils.createKeyPair(this, SharedData.CRYPTO_ALIAS_DATA);
-		RSAPublicKey rsaPublicKey = RSACryptingUtils.getRSAPublicKey(SharedData.CRYPTO_ALIAS_DATA);
+		CryptoUtils.createKeyPair(this, SharedData.CRYPTO_ALIAS_WEAR);
+		RSAPublicKey rsaPublicKey = RSACryptingUtils.getRSAPublicKey(SharedData.CRYPTO_ALIAS_WEAR);
 		byte[] keyBytes = rsaPublicKey.getEncoded();
 		DataMap sendPublicKey = new DataMap();
 		sendPublicKey.putByteArray(SharedData.SEND_DATA, keyBytes);

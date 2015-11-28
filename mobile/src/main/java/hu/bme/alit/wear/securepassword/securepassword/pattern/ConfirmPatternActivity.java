@@ -9,6 +9,7 @@ import android.os.Bundle;
 
 import java.util.List;
 
+import hu.bme.alit.wear.common.SharedData;
 import hu.bme.alit.wear.common.utils.PreferenceContract;
 import hu.bme.alit.wear.common.utils.PreferenceUtils;
 import me.zhanghai.patternlock.PatternView;
@@ -29,7 +30,7 @@ public class ConfirmPatternActivity extends me.zhanghai.patternlock.ConfirmPatte
 
     @Override
     protected boolean isPatternCorrect(List<PatternView.Cell> pattern) {
-        return PatternLockUtils.isPatternCorrect(pattern, this);
+        return PatternLockUtils.isPatternCorrect(pattern, this, SharedData.CRYPTO_ALIAS_MOBILE);
     }
 
     @Override
