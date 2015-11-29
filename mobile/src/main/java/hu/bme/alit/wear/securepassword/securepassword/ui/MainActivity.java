@@ -32,6 +32,7 @@ import hu.bme.alit.wear.common.SharedData;
 import hu.bme.alit.wear.common.helper.DefaultWearSyncHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
 import hu.bme.alit.wear.common.security.CryptoUtils;
+import hu.bme.alit.wear.common.security.RSACryptingUtils;
 import hu.bme.alit.wear.common.utils.NavigationUtils;
 import hu.bme.alit.wear.common.utils.PreferenceContract;
 import hu.bme.alit.wear.common.utils.PreferenceUtils;
@@ -174,8 +175,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			if (intent.getAction().equals(MobileDataLayerListenerService.DATA_BROADCAST_ACTION)) {
 				byte[] rawPublicKey = intent.getExtras().getByteArray(MobileDataLayerListenerService.DATA_BROADCAST_PUBLIC_KEY);
 				try {
-					rsaPublicKeyWear =
-							(RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(rawPublicKey));
+					rsaPublicKeyWear = (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(rawPublicKey));
+
+					//Send the pattern if the pattern is set before getting the wear's RSA public key.
+					String encryptedKeyPattern = PreferenceUtils.getString(PreferenceContract.KEY_PATTERN, null, context);
+					if (encryptedKeyPattern != null) {
+						String keyPattern = RSACryptingUtils.RSADecrypt(encryptedKeyPattern, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS_MOBILE));
+						sendPatternEncrypted(keyPattern, SharedData.CRYPTO_ALIAS_WEAR);
+					}
 				} catch (InvalidKeySpecException e) {
 					e.printStackTrace();
 				} catch (NoSuchAlgorithmException e) {
@@ -211,6 +218,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			wearSyncHelper.sendData(SharedData.REQUEST_PATH_PATTERN, sendMasterPassword);
 		}
 	}
-
-
 }

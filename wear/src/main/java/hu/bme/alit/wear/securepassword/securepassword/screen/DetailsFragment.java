@@ -44,8 +44,6 @@ public class DetailsFragment extends Fragment {
 		storeHelper = ((MainActivity)getActivity()).getStoreHelper();
 
 		String encryptedPassword = storeHelper.getPassword(selectedSubject);
-//		String encryptedMasterPassword = PreferenceUtils.getString(SharedData.SHARED_PREFERENCES_PW, null, getActivity());
-//		String decryptedMasterPassword = RSACryptingUtils.RSADecrypt(encryptedMasterPassword, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS_WEAR));
 		String password = RSACryptingUtils.RSADecrypt(encryptedPassword, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS_WEAR));
 
 		passwordText.setText(password);

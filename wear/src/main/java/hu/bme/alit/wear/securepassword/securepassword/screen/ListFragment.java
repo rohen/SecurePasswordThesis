@@ -1,6 +1,8 @@
 package hu.bme.alit.wear.securepassword.securepassword.screen;
 
+import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.wearable.view.WatchViewStub;
 import android.support.wearable.view.WearableListView;
@@ -15,6 +17,7 @@ import hu.bme.alit.wear.common.helper.StoreHelper;
 import hu.bme.alit.wear.common.utils.NavigationUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
 import hu.bme.alit.wear.securepassword.securepassword.list.PasswordListAdapter;
+import hu.bme.alit.wear.securepassword.securepassword.pattern.PatternLockUtils;
 
 /**
  * Created by alit on 16/11/2015.
@@ -30,6 +33,8 @@ public class ListFragment extends Fragment {
 	private StoreHelper storeHelper;
 
 	private PasswordListAdapter passwordListAdapter;
+
+	private int clickedPosition;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,6 +71,20 @@ public class ListFragment extends Fragment {
 		passwordListAdapter.notifyDataSetChanged();
 	}
 
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == Activity.RESULT_OK) {
+			View contentFrame = getActivity().findViewById(R.id.content_frame);
+			DetailsFragment detailsFragment = new DetailsFragment();
+			Bundle bundle = new Bundle();
+			bundle.putString(DetailsFragment.EXTRA_SUBJECT, subjects.get(clickedPosition));
+			detailsFragment.setArguments(bundle);
+			NavigationUtils.navigateToFragment(getActivity(), contentFrame, detailsFragment, DetailsFragment.FRAGMENT_DETAILS_PASSWORD_TAG, true, false);
+		} else {
+			super.onActivityResult(requestCode, resultCode, data);
+		}
+	}
+
 	public WearableListView.ClickListener getOnClickListener() {
 		return new PasswordListClickListener();
 	}
@@ -73,12 +92,8 @@ public class ListFragment extends Fragment {
 	private class PasswordListClickListener implements WearableListView.ClickListener {
 		@Override
 		public void onClick(WearableListView.ViewHolder viewHolder) {
-			View contentFrame = getActivity().findViewById(R.id.content_frame);
-			DetailsFragment detailsFragment = new DetailsFragment();
-			Bundle bundle = new Bundle();
-			bundle.putString(DetailsFragment.EXTRA_SUBJECT, subjects.get(viewHolder.getLayoutPosition()));
-			detailsFragment.setArguments(bundle);
-			NavigationUtils.navigateToFragment(getActivity(), contentFrame, detailsFragment, DetailsFragment.FRAGMENT_DETAILS_PASSWORD_TAG, true, false);
+			PatternLockUtils.confirmPattern(getActivity(), ListFragment.this);
+			clickedPosition = viewHolder.getLayoutPosition();
 		}
 
 		@Override

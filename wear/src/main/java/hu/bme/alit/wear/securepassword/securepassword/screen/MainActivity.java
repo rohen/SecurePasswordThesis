@@ -24,6 +24,8 @@ import hu.bme.alit.wear.common.helper.WearSyncHelper;
 import hu.bme.alit.wear.common.security.CryptoUtils;
 import hu.bme.alit.wear.common.security.RSACryptingUtils;
 import hu.bme.alit.wear.common.utils.NavigationUtils;
+import hu.bme.alit.wear.common.utils.PreferenceContract;
+import hu.bme.alit.wear.common.utils.PreferenceUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
 import hu.bme.alit.wear.securepassword.securepassword.communication.WearDataLayerListenerService;
 
@@ -45,13 +47,10 @@ public class MainActivity extends Activity implements DataApi.DataListener,
 		storeHelper = new DefaultStoreHelper(this);
 
 		wearSyncHelper = new DefaultWearSyncHelper(this, this, this, this);
-		sendMessageToHandheld();
 
-		dataBroadcastReceiver = new DataBroadcastReceiver();
-		IntentFilter intentFilter = new IntentFilter();
-		intentFilter.addAction(WearDataLayerListenerService.DATA_BROADCAST_ACTION);
-		registerReceiver(dataBroadcastReceiver, intentFilter);
-
+		if (!PreferenceUtils.getBoolean(PreferenceContract.WEAR_PUBLIC_KEY_SENT, false, this)) {
+			sendPublicKeyToHandheld();
+		}
 		View contentFrame = findViewById(R.id.content_frame);
 		NavigationUtils.navigateToFragment(this, contentFrame, new ListFragment(), ListFragment.FRAGMENT_LIST_PASSWORDS_TAG, true, false);
 	}
@@ -60,11 +59,14 @@ public class MainActivity extends Activity implements DataApi.DataListener,
 	protected void onResume() {
 		super.onResume();
 		wearSyncHelper.connectGoogleApiClient();
+
+		registerDataBroadcastReceiver();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
+
 		wearSyncHelper.disconnectGoogleApiClient();
 	}
 
@@ -110,12 +112,20 @@ public class MainActivity extends Activity implements DataApi.DataListener,
 		}
 	}
 
-	private void sendMessageToHandheld() {
+	private void registerDataBroadcastReceiver() {
+		dataBroadcastReceiver = new DataBroadcastReceiver();
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(WearDataLayerListenerService.DATA_BROADCAST_ACTION);
+		registerReceiver(dataBroadcastReceiver, intentFilter);
+	}
+
+	private void sendPublicKeyToHandheld() {
 		CryptoUtils.createKeyPair(this, SharedData.CRYPTO_ALIAS_WEAR);
 		RSAPublicKey rsaPublicKey = RSACryptingUtils.getRSAPublicKey(SharedData.CRYPTO_ALIAS_WEAR);
 		byte[] keyBytes = rsaPublicKey.getEncoded();
 		DataMap sendPublicKey = new DataMap();
 		sendPublicKey.putByteArray(SharedData.SEND_DATA, keyBytes);
 		wearSyncHelper.sendData(SharedData.REQUEST_PATH_PUBLIC_KEY_RECEIVED, sendPublicKey);
+		PreferenceUtils.putBoolean(PreferenceContract.WEAR_PUBLIC_KEY_SENT, true, this);
 	}
 }

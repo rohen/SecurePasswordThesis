@@ -13,4 +13,5 @@ public class PreferenceContract {
 	public static final String KEY_PATTERN = "master_password";
 	public static final String PATTERN_ADDED = "master_password_added";
 
+	public static final String WEAR_PUBLIC_KEY_SENT = "wear_public_key_sent";
 }
