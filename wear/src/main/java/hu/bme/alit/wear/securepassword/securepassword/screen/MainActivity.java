@@ -48,9 +48,10 @@ public class MainActivity extends Activity implements DataApi.DataListener,
 
 		wearSyncHelper = new DefaultWearSyncHelper(this, this, this, this);
 
-		if (!PreferenceUtils.getBoolean(PreferenceContract.WEAR_PUBLIC_KEY_SENT, false, this)) {
+		//TODO do to make sure that the public key will be received.
+//		if (!PreferenceUtils.getBoolean(PreferenceContract.WEAR_PUBLIC_KEY_SENT, false, this)) {
 			sendPublicKeyToHandheld();
-		}
+//		}
 		View contentFrame = findViewById(R.id.content_frame);
 		NavigationUtils.navigateToFragment(this, contentFrame, new ListFragment(), ListFragment.FRAGMENT_LIST_PASSWORDS_TAG, true, false);
 	}
