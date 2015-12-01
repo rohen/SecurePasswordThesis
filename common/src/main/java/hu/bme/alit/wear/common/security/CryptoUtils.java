@@ -2,17 +2,21 @@ package hu.bme.alit.wear.common.security;
 
 import android.content.Context;
 import android.security.KeyPairGeneratorSpec;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.KeyPair;
+import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -33,6 +37,7 @@ public class CryptoUtils {
 				Calendar start = Calendar.getInstance();
 				Calendar end = Calendar.getInstance();
 				end.add(Calendar.YEAR, 1);
+				//TODO recode to KeyGenParameterSpec
 				KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(context)
 						.setAlias(alias)
 						.setSubject(new X500Principal("CN=Sample Name, O=Android Authority"))
@@ -43,7 +48,7 @@ public class CryptoUtils {
 				KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", "AndroidKeyStore");
 				generator.initialize(spec);
 
-				KeyPair keyPair = generator.generateKeyPair();
+				generator.generateKeyPair();
 			}
 		} catch (Exception e) {
 			Toast.makeText(context, "Exception " + e.getMessage() + " occured", Toast.LENGTH_LONG).show();
@@ -68,5 +73,18 @@ public class CryptoUtils {
 		KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
 		keyStore.load(null);
 		return keyStore;
+	}
+
+	public static @Nullable RSAPublicKey getRSAPublicKeyFromString(String rawRSAPublicKey) {
+		byte[] rsaPublicKeyInBytes = CryptoFormatUtils.convertToHex(rawRSAPublicKey);
+		try {
+			X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(rsaPublicKeyInBytes);
+			return (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(x509EncodedKeySpec);
+		} catch (InvalidKeySpecException e) {
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

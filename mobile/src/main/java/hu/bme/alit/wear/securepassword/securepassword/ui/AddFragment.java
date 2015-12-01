@@ -19,8 +19,11 @@ import hu.bme.alit.wear.common.SharedData;
 import hu.bme.alit.wear.common.helper.DefaultStoreHelper;
 import hu.bme.alit.wear.common.helper.StoreHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
+import hu.bme.alit.wear.common.security.CryptoUtils;
 import hu.bme.alit.wear.common.security.RSACryptingUtils;
 import hu.bme.alit.wear.common.utils.NavigationUtils;
+import hu.bme.alit.wear.common.utils.PreferenceContract;
+import hu.bme.alit.wear.common.utils.PreferenceUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
 
 public class AddFragment extends Fragment {
@@ -116,8 +119,8 @@ public class AddFragment extends Fragment {
 	private void sendMessageToWear(String subject, String password) {
 		final WearSyncHelper wearSyncHelper = ((MainActivity) getActivity()).getWearSyncHelper();
 
-//		String masterPassword = SharedPreferencesUtils.getStringData(getActivity(), SharedData.SHARED_PREFERENCES_PW);
-		String encryptedPassword = RSACryptingUtils.RSAEncrypt(password, ((MainActivity) getActivity()).getRsaPublicKeyWear());
+		String rawRSAPublicKey = PreferenceUtils.getString(PreferenceContract.WEAR_PUBLIC_KEY_DATA, null, getActivity());
+		String encryptedPassword = RSACryptingUtils.RSAEncrypt(password, CryptoUtils.getRSAPublicKeyFromString(rawRSAPublicKey));
 		if (encryptedPassword != null) {
 			DataMap newPassword = new DataMap();
 			newPassword.putStringArray(SharedData.SEND_DATA, storeHelper.createStringArrayFromData(subject, encryptedPassword));

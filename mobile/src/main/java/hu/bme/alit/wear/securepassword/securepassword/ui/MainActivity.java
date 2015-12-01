@@ -22,15 +22,12 @@ import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataMap;
 
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
 
 import hu.bme.alit.wear.common.SharedData;
 import hu.bme.alit.wear.common.helper.DefaultWearSyncHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
+import hu.bme.alit.wear.common.security.CryptoFormatUtils;
 import hu.bme.alit.wear.common.security.CryptoUtils;
 import hu.bme.alit.wear.common.security.RSACryptingUtils;
 import hu.bme.alit.wear.common.utils.NavigationUtils;
@@ -52,8 +49,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	private WearSyncHelper wearSyncHelper;
 
 	private DataBroadcastReceiver dataBroadcastReceiver;
-
-	private RSAPublicKey rsaPublicKeyWear;
 
 
 	@Override
@@ -174,26 +169,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		public void onReceive(Context context, Intent intent) {
 			if (intent.getAction().equals(MobileDataLayerListenerService.DATA_BROADCAST_ACTION)) {
 				byte[] rawPublicKey = intent.getExtras().getByteArray(MobileDataLayerListenerService.DATA_BROADCAST_PUBLIC_KEY);
-				try {
-					rsaPublicKeyWear = (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(rawPublicKey));
-
-					//Send the pattern if the pattern is set before getting the wear's RSA public key.
-					String encryptedKeyPattern = PreferenceUtils.getString(PreferenceContract.KEY_PATTERN, null, context);
-					if (encryptedKeyPattern != null) {
-						String keyPattern = RSACryptingUtils.RSADecrypt(encryptedKeyPattern, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS_MOBILE));
-						sendPatternEncrypted(keyPattern, SharedData.CRYPTO_ALIAS_WEAR);
-					}
-				} catch (InvalidKeySpecException e) {
-					e.printStackTrace();
-				} catch (NoSuchAlgorithmException e) {
-					e.printStackTrace();
+				String convertedRawPublicKey = CryptoFormatUtils.convertToString(rawPublicKey);
+				PreferenceUtils.putString(PreferenceContract.WEAR_PUBLIC_KEY_DATA, convertedRawPublicKey, MainActivity.this);
+				//Send the pattern if the pattern is set before getting the wear's RSA public key.
+				String encryptedKeyPattern = PreferenceUtils.getString(PreferenceContract.KEY_PATTERN, null, context);
+				if (encryptedKeyPattern != null) {
+					String keyPattern = RSACryptingUtils.RSADecrypt(encryptedKeyPattern, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS_MOBILE));
+					sendPatternEncrypted(keyPattern, SharedData.CRYPTO_ALIAS_WEAR);
 				}
 			}
 		}
-	}
-
-	public RSAPublicKey getRsaPublicKeyWear() {
-		return rsaPublicKeyWear;
 	}
 
 	@Override
@@ -210,12 +195,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 
 	private void sendPatternEncrypted(String patternString, String alias) {
-		CryptoUtils.createKeyPair(this, alias);
-		String encryptedPattern = PatternLockUtils.encryptPattern(this, patternString, alias, rsaPublicKeyWear);
-		if (encryptedPattern != null) {
-			DataMap sendMasterPassword = new DataMap();
-			sendMasterPassword.putString(SharedData.SEND_DATA, encryptedPattern);
-			wearSyncHelper.sendData(SharedData.REQUEST_PATH_PATTERN, sendMasterPassword);
+		//TODO ez kell ide???
+//		CryptoUtils.createKeyPair(this, alias);
+		String rawRSAPublicKey = PreferenceUtils.getString(PreferenceContract.WEAR_PUBLIC_KEY_DATA, null, this);
+		if (rawRSAPublicKey != null) {
+			RSAPublicKey rsaPublicKeyWear = CryptoUtils.getRSAPublicKeyFromString(rawRSAPublicKey);
+			String encryptedPattern = PatternLockUtils.encryptPattern(this, patternString, alias, rsaPublicKeyWear);
+			if (encryptedPattern != null) {
+				DataMap sendMasterPassword = new DataMap();
+				sendMasterPassword.putString(SharedData.SEND_DATA, encryptedPattern);
+				wearSyncHelper.sendData(SharedData.REQUEST_PATH_PATTERN, sendMasterPassword);
+			}
 		}
 	}
 }
