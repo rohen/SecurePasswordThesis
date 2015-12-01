@@ -12,6 +12,7 @@ import android.content.Intent;
 
 import java.util.List;
 
+import hu.bme.alit.wear.common.security.CryptoUtils;
 import hu.bme.alit.wear.common.security.RSACryptingUtils;
 import hu.bme.alit.wear.common.utils.PreferenceContract;
 import hu.bme.alit.wear.common.utils.PreferenceUtils;
@@ -24,9 +25,10 @@ public class PatternLockUtils {
 
 	public static boolean isPatternCorrect(List<PatternView.Cell> pattern, Context context, String alias) {
 		String confirmPattern = PatternUtils.patternToString(pattern);
+		String confirmPatternHexed = CryptoUtils.getSha1Hex(confirmPattern);
 		String encryptedCorrectPattern = PreferenceUtils.getString(PreferenceContract.KEY_PATTERN, null, context);
 		String correctPattern = decryptPattern(encryptedCorrectPattern, alias);
-		return confirmPattern.equals(correctPattern);
+		return !(correctPattern == null || confirmPatternHexed == null) && confirmPatternHexed.equals(correctPattern);
 	}
 
 	// NOTE: Should only be called when there is a pattern for this account.

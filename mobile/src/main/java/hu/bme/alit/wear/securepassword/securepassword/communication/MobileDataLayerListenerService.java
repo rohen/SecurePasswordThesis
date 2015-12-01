@@ -32,7 +32,6 @@ public class MobileDataLayerListenerService extends WearableListenerService impl
 		super.onCreate();
 
 		wearSyncHelper = new DefaultWearSyncHelper(this, this, this, null);
-
 	}
 
 	@Override

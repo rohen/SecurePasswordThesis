@@ -12,6 +12,7 @@ package me.zhanghai.patternlock;
 
 import android.util.Base64;
 
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +53,28 @@ public class PatternUtils {
 
 	public static List<PatternView.Cell> stringToPattern(String string) {
 		return bytesToPattern(stringToBytes(string));
+	}
+
+	public static String getSha1Hex(List<PatternView.Cell> cellList)
+	{
+		try
+		{
+			String cells = PatternUtils.patternToString(cellList);
+			MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+			messageDigest.update(cells.getBytes());
+			byte[] bytes = messageDigest.digest();
+			StringBuilder buffer = new StringBuilder();
+			for (byte b : bytes)
+			{
+				buffer.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
+			}
+			return buffer.toString();
+		}
+		catch (Exception ignored)
+		{
+			ignored.printStackTrace();
+			return null;
+		}
 	}
 
 }

@@ -1,7 +1,9 @@
 package hu.bme.alit.wear.securepassword.securepassword.ui;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
@@ -19,12 +21,15 @@ import hu.bme.alit.wear.common.SharedData;
 import hu.bme.alit.wear.common.helper.DefaultStoreHelper;
 import hu.bme.alit.wear.common.helper.StoreHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
+import hu.bme.alit.wear.common.security.AesCryptingUtils;
 import hu.bme.alit.wear.common.security.CryptoUtils;
 import hu.bme.alit.wear.common.security.RSACryptingUtils;
 import hu.bme.alit.wear.common.utils.NavigationUtils;
 import hu.bme.alit.wear.common.utils.PreferenceContract;
 import hu.bme.alit.wear.common.utils.PreferenceUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
+import hu.bme.alit.wear.securepassword.securepassword.pattern.PatternLockUtils;
+import me.zhanghai.patternlock.ConfirmPatternActivity;
 
 public class AddFragment extends Fragment {
 
@@ -94,26 +99,42 @@ public class AddFragment extends Fragment {
 
 			hideKeyboard();
 
-			String subject = subjectEditText.getText().toString();
+			//8. Felveszek egy új adatot.
 			String password = passwordEditText.getText().toString();
 			String passwordAgain = passwordAgainEditText.getText().toString();
-			if(!password.equals(passwordAgain)) {
+			if (!password.equals(passwordAgain)) {
 				showSnackBarMessage(getString(R.string.add_password_not_equal));
 				return;
 			}
-			String encryptedPassword = encryptPassword(password);
+			//7. Bekérem újra a kulcsmintát a felhasználótól, amit hashelek.
+			PatternLockUtils.confirmPattern(getActivity(), AddFragment.this);
+
+		}
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == Activity.RESULT_OK) {
+			String hexedPattern = data.getStringExtra(ConfirmPatternActivity.EXTRA_KEY_PATTERN_HEXED);
+			String subject = subjectEditText.getText().toString();
+			String password = passwordEditText.getText().toString();
+
+			//13.Ha megegyezik, akkor szinkron módon titkosítom az adatot a kulcsminta hasheével.
+			String encryptedPassword = AesCryptingUtils.encrypt(password, hexedPattern);
 			if (!subject.equals("") && encryptedPassword != null && storeHelper.addPassword(subject, encryptedPassword)) {
-				sendMessageToWear(subject, password);
+				sendMessageToWear(subject, encryptedPassword);
 				showSnackBarMessage(getString(R.string.add_password_store_success));
 				NavigationUtils.navigateToBack(getActivity());
 			} else {
 				showSnackBarMessage(getString(R.string.add_password_store_failed));
 			}
+		} else {
+			super.onActivityResult(requestCode, resultCode, data);
 		}
 	}
 
 	private String encryptPassword(String password) {
-		return RSACryptingUtils.RSAEncrypt(password, RSACryptingUtils.getRSAPublicKey(SharedData.CRYPTO_ALIAS_MOBILE));
+		return RSACryptingUtils.RSAEncrypt(password, RSACryptingUtils.getRSAPublicKey(SharedData.CRYPTO_ALIAS_MASTER));
 	}
 
 	private void sendMessageToWear(String subject, String password) {

@@ -5,6 +5,7 @@
 
 package me.zhanghai.patternlock;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -16,6 +17,8 @@ import java.util.List;
 // https://android.googlesource.com/platform/frameworks/base/+/master/packages/Keyguard/src/com/android/keyguard/KeyguardPatternView.java
 public class ConfirmPatternActivity extends BasePatternActivity
 		implements PatternView.OnPatternListener {
+
+	public static final String EXTRA_KEY_PATTERN_HEXED = "pattern_hexed";
 
 	private static final String KEY_NUM_FAILED_ATTEMPTS = "num_failed_attempts";
 
@@ -76,7 +79,10 @@ public class ConfirmPatternActivity extends BasePatternActivity
 	@Override
 	public void onPatternDetected(List<PatternView.Cell> pattern) {
 		if (isPatternCorrect(pattern)) {
-			onConfirmed();
+			String patternHexed = PatternUtils.getSha1Hex(pattern);
+			Intent intent = new Intent();
+			intent.putExtra(EXTRA_KEY_PATTERN_HEXED, patternHexed);
+			onConfirmed(intent);
 		} else {
 			messageText.setText(R.string.pl_wrong_pattern);
 			patternView.setDisplayMode(PatternView.DisplayMode.Wrong);
@@ -99,8 +105,8 @@ public class ConfirmPatternActivity extends BasePatternActivity
 		return true;
 	}
 
-	protected void onConfirmed() {
-		setResult(RESULT_OK);
+	protected void onConfirmed(Intent intent) {
+		setResult(RESULT_OK, intent);
 		finish();
 	}
 

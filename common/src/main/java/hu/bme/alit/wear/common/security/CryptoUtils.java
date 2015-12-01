@@ -12,6 +12,7 @@ import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPublicKey;
@@ -86,5 +87,26 @@ public class CryptoUtils {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static String getSha1Hex(String clearString)
+	{
+		try
+		{
+			MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+			messageDigest.update(clearString.getBytes());
+			byte[] bytes = messageDigest.digest();
+			StringBuilder buffer = new StringBuilder();
+			for (byte b : bytes)
+			{
+				buffer.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
+			}
+			return buffer.toString();
+		}
+		catch (Exception ignored)
+		{
+			ignored.printStackTrace();
+			return null;
+		}
 	}
 }

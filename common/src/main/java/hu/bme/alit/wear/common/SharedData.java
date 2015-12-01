@@ -18,5 +18,5 @@ public class SharedData {
 	public static final String SEND_DATA = "send_data";
 
 	public static final String CRYPTO_ALIAS_WEAR = "crypto_alias_data";
-	public static final String CRYPTO_ALIAS_MOBILE = "crypto_alias_master";
+	public static final String CRYPTO_ALIAS_MASTER = "crypto_alias_master";
 }

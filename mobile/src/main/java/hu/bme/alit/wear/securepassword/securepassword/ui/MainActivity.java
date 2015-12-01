@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		intentFilter.addAction(MobileDataLayerListenerService.DATA_BROADCAST_ACTION);
 		registerReceiver(dataBroadcastReceiver, intentFilter);
 
+		//1.A felhasználó el?ször megadja a kulcsmintát.
 		boolean isPasswordAdded = PreferenceUtils.getBoolean(PreferenceContract.PATTERN_ADDED, false, this);
 		if (!isPasswordAdded) {
 			this.startActivityForResult(new Intent(this, SetPatternActivity.class), RESULT_CREATE_PATTERN_CODE);
@@ -174,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 				//Send the pattern if the pattern is set before getting the wear's RSA public key.
 				String encryptedKeyPattern = PreferenceUtils.getString(PreferenceContract.KEY_PATTERN, null, context);
 				if (encryptedKeyPattern != null) {
-					String keyPattern = RSACryptingUtils.RSADecrypt(encryptedKeyPattern, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS_MOBILE));
+					String keyPattern = RSACryptingUtils.RSADecrypt(encryptedKeyPattern, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS_MASTER));
 					sendPatternEncrypted(keyPattern, SharedData.CRYPTO_ALIAS_WEAR);
 				}
 			}
@@ -185,8 +186,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_CREATE_PATTERN_CODE) {
 			String patternString = PatternUtils.bytesToString(data.getByteArrayExtra(RESULT_CREATE_PATTERN_DATA));
-			PatternLockUtils.savePatternEncrypted(this, patternString, SharedData.CRYPTO_ALIAS_MOBILE);
-			sendPatternEncrypted(patternString, SharedData.CRYPTO_ALIAS_WEAR);
+			//2. Egy hash függvénnyel hashelem a kulcsminta értékét.
+			String hashPattern = CryptoUtils.getSha1Hex(patternString);
+			PatternLockUtils.savePatternEncrypted(this, hashPattern, SharedData.CRYPTO_ALIAS_MASTER);
+			//7. Elküldöm az órának a kulcsminta hashet.
+			sendPatternEncrypted(hashPattern, SharedData.CRYPTO_ALIAS_WEAR);
 			PreferenceUtils.putBoolean(PreferenceContract.PATTERN_ADDED, true, this);
 			NavigationUtils.navigateToFragment(this, getContentFrame(), new GreetingsFragment(), GreetingsFragment.FRAGMENT_GREETINGS_TAG, true, false);
 		} else {

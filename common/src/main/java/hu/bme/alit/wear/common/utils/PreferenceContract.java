@@ -10,6 +10,7 @@ public class PreferenceContract {
 	public static final String KEY_PATTERN_VISIBLE = "pref_key_pattern_visible";
 	public static final Boolean DEFAULT_PATTERN_VISIBLE = true;
 
+	public static final String KEY_MASTER = "key_master";
 	public static final String KEY_PATTERN = "master_password";
 	public static final String PATTERN_ADDED = "master_password_added";
 

@@ -9,7 +9,10 @@ import android.widget.TextView;
 
 import hu.bme.alit.wear.common.SharedData;
 import hu.bme.alit.wear.common.helper.StoreHelper;
+import hu.bme.alit.wear.common.security.AesCryptingUtils;
 import hu.bme.alit.wear.common.security.RSACryptingUtils;
+import hu.bme.alit.wear.common.utils.PreferenceContract;
+import hu.bme.alit.wear.common.utils.PreferenceUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
 
 /**
@@ -39,12 +42,14 @@ public class DetailsFragment extends Fragment {
 
 		View view = inflater.inflate(R.layout.fragment_details, container, false);
 
-		TextView passwordText = (TextView)view.findViewById(R.id.password_text);
+		TextView passwordText = (TextView) view.findViewById(R.id.password_text);
 
-		storeHelper = ((MainActivity)getActivity()).getStoreHelper();
+		storeHelper = ((MainActivity) getActivity()).getStoreHelper();
 
-		String encryptedPassword = storeHelper.getPassword(selectedSubject);
-		String password = RSACryptingUtils.RSADecrypt(encryptedPassword, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS_WEAR));
+		String rsaEncryptedPassword = storeHelper.getPassword(selectedSubject);
+		String aesEncryptedPassword = RSACryptingUtils.RSADecrypt(rsaEncryptedPassword, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS_WEAR));
+		String encryptedCorrectPattern = PreferenceUtils.getString(PreferenceContract.KEY_PATTERN, null, getActivity());
+		String password = AesCryptingUtils.decrypt(aesEncryptedPassword, encryptedCorrectPattern);
 
 		passwordText.setText(password);
 
