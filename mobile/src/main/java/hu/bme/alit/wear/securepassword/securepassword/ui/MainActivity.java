@@ -20,7 +20,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.DataMap;
 
 import java.security.interfaces.RSAPublicKey;
 
@@ -71,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		intentFilter.addAction(MobileDataLayerListenerService.DATA_BROADCAST_ACTION);
 		registerReceiver(dataBroadcastReceiver, intentFilter);
 
-		//1.A felhasználó el?ször megadja a kulcsmintát.
 		boolean isPasswordAdded = PreferenceUtils.getBoolean(PreferenceContract.PATTERN_ADDED, false, this);
 		if (!isPasswordAdded) {
 			this.startActivityForResult(new Intent(this, SetPatternActivity.class), RESULT_CREATE_PATTERN_CODE);
@@ -173,10 +171,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 				String convertedRawPublicKey = CryptoFormatUtils.convertToString(rawPublicKey);
 				PreferenceUtils.putString(PreferenceContract.WEAR_PUBLIC_KEY_DATA, convertedRawPublicKey, MainActivity.this);
 				//Send the pattern if the pattern is set before getting the wear's RSA public key.
-				String encryptedKeyPattern = PreferenceUtils.getString(PreferenceContract.KEY_PATTERN, null, context);
+				String encryptedKeyPattern = PreferenceUtils.getString(PreferenceContract.KEY_ENCRYPTED_MASTER, null, context);
 				if (encryptedKeyPattern != null) {
-					String keyPattern = RSACryptingUtils.RSADecrypt(encryptedKeyPattern, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS_MASTER));
-					sendPatternEncrypted(keyPattern, SharedData.CRYPTO_ALIAS_WEAR);
+					sendMasterKeyToWear();
 				}
 			}
 		}
@@ -186,11 +183,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_CREATE_PATTERN_CODE) {
 			String patternString = PatternUtils.bytesToString(data.getByteArrayExtra(RESULT_CREATE_PATTERN_DATA));
-			//2. Egy hash függvénnyel hashelem a kulcsminta értékét.
+
 			String hashPattern = CryptoUtils.getSha1Hex(patternString);
-			PatternLockUtils.savePatternEncrypted(this, hashPattern, SharedData.CRYPTO_ALIAS_MASTER);
-			//7. Elküldöm az órának a kulcsminta hashet.
-			sendPatternEncrypted(hashPattern, SharedData.CRYPTO_ALIAS_WEAR);
+			PatternLockUtils.savePatternSecurityDataEncrypted(this, hashPattern, SharedData.CRYPTO_ALIAS_MASTER);
+
+			sendMasterKeyToWear();
 			PreferenceUtils.putBoolean(PreferenceContract.PATTERN_ADDED, true, this);
 			NavigationUtils.navigateToFragment(this, getContentFrame(), new GreetingsFragment(), GreetingsFragment.FRAGMENT_GREETINGS_TAG, true, false);
 		} else {
@@ -198,18 +195,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		}
 	}
 
-	private void sendPatternEncrypted(String patternString, String alias) {
-		//TODO ez kell ide???
-//		CryptoUtils.createKeyPair(this, alias);
+	private void sendMasterKeyToWear() {
 		String rawRSAPublicKey = PreferenceUtils.getString(PreferenceContract.WEAR_PUBLIC_KEY_DATA, null, this);
 		if (rawRSAPublicKey != null) {
 			RSAPublicKey rsaPublicKeyWear = CryptoUtils.getRSAPublicKeyFromString(rawRSAPublicKey);
-			String encryptedPattern = PatternLockUtils.encryptPattern(this, patternString, alias, rsaPublicKeyWear);
-			if (encryptedPattern != null) {
-				DataMap sendMasterPassword = new DataMap();
-				sendMasterPassword.putString(SharedData.SEND_DATA, encryptedPattern);
-				wearSyncHelper.sendData(SharedData.REQUEST_PATH_PATTERN, sendMasterPassword);
-			}
+			String masterKeyEncrypted = PreferenceUtils.getString(PreferenceContract.KEY_ENCRYPTED_MASTER, null, this);
+			String RSAEncryptedMasterKey = RSACryptingUtils.RSAEncrypt(masterKeyEncrypted, rsaPublicKeyWear);
+			wearSyncHelper.sendSimpleStringData(SharedData.REQUEST_PATH_ENCRYPTED_MASTER_KEY, RSAEncryptedMasterKey);
+			String rawMesterKey = PreferenceUtils.getString(PreferenceContract.KEY_RAW_MASTER, null, this);
+			String encryptedRawMasterKey = RSACryptingUtils.RSAEncrypt(rawMesterKey, rsaPublicKeyWear);
+			wearSyncHelper.sendSimpleStringData(SharedData.REQUEST_PATH_RAW_MASTER_KEY, encryptedRawMasterKey);
 		}
 	}
 }

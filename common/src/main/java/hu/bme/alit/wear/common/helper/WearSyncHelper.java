@@ -16,4 +16,6 @@ public interface WearSyncHelper extends Serializable {
 	void connectedGoogleApiClient();
 
 	void sendData(String requestPath, DataMap dataMap);
+
+	void sendSimpleStringData(String requestPath, String data);
 }

@@ -11,12 +11,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
-import java.security.PrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 
 import hu.bme.alit.wear.common.security.AesCryptingUtils;
-import hu.bme.alit.wear.common.security.CryptoFormatUtils;
 import hu.bme.alit.wear.common.security.CryptoUtils;
 import hu.bme.alit.wear.common.security.RSACryptingUtils;
 import hu.bme.alit.wear.common.utils.PreferenceContract;
@@ -30,21 +28,20 @@ public class PatternLockUtils {
 	public static final int REQUEST_CODE_CONFIRM_PATTERN = 199;
 
 	public static boolean hasPattern(Context context) {
-		return !TextUtils.isEmpty(PreferenceUtils.getString(PreferenceContract.KEY_PATTERN, null, context));
+		return !TextUtils.isEmpty(PreferenceUtils.getString(PreferenceContract.KEY_ENCRYPTED_MASTER, null, context));
 	}
 
 	public static boolean isPatternCorrect(List<PatternView.Cell> pattern, Context context, String alias) {
 		String confirmPattern = PatternUtils.patternToString(pattern);
 		String confirmPatternHashed = CryptoUtils.getSha1Hex(confirmPattern);
 		//10. A hashhel feloldom a generált privát kulcs hashének titkosítását
-		String encryptedMaster = PreferenceUtils.getString(PreferenceContract.KEY_PATTERN, null, context);
+		String encryptedMaster = PreferenceUtils.getString(PreferenceContract.KEY_ENCRYPTED_MASTER, null, context);
 		String decryptedPrivateKey = AesCryptingUtils.decrypt(encryptedMaster, confirmPatternHashed);
 		//11. Lekérem a generált kulcspár privát kulcsát, és hashelem.
-		PrivateKey privateKeyFromKeyStore = RSACryptingUtils.getRSAPrivateKey(alias);
-		byte[] rsaPrivateKeyInBytes = privateKeyFromKeyStore.getEncoded();
-		String rsaPrivateKeyHex = CryptoUtils.getSha1Hex(CryptoFormatUtils.convertToString(rsaPrivateKeyInBytes));
+		String rawMaster = PreferenceUtils.getString(PreferenceContract.KEY_RAW_MASTER, null, context);
+		String rawMasterKeyHash = CryptoUtils.getSha1Hex(rawMaster);
 		//12. Összehasonlítom az eltárolt privát kulcs hashét.
-		return decryptedPrivateKey != null && rsaPrivateKeyHex != null && decryptedPrivateKey.equals(rsaPrivateKeyHex);
+		return decryptedPrivateKey != null && rawMasterKeyHash != null && decryptedPrivateKey.equals(rawMasterKeyHash);
 	}
 
 	public static void clearPattern(Context context) {
@@ -81,26 +78,21 @@ public class PatternLockUtils {
 		}
 	}
 
-	public static void savePatternEncrypted(Context context, String hashPattern, String alias) {
-		//3. Generálok egy privát-publikus kulcspárt.
-		CryptoUtils.createKeyPair(context, alias);
-		PrivateKey rsaPrivateKey = RSACryptingUtils.getRSAPrivateKey(alias);
-		byte[] rsaPrivateKeyInBytes = rsaPrivateKey.getEncoded();
-		//4. A privát kulcsot hashelem.
-		String rsaPrivateKeyHex = CryptoUtils.getSha1Hex(CryptoFormatUtils.convertToString(rsaPrivateKeyInBytes));
-		//5. A privát kulcs hashét titkosítom a kulcsminta hashével.
-		String encryptedMaster = AesCryptingUtils.encrypt(rsaPrivateKeyHex, hashPattern);
+	public static void savePatternSecurityDataEncrypted(Context context, String hashPattern, String alias) {
+		String generatedKey = CryptoUtils.getMasterKey();
+		String generatedKeyHex = CryptoUtils.getSha1Hex(generatedKey);
+		String encryptedMaster = AesCryptingUtils.encrypt(generatedKeyHex, hashPattern);
 		if (encryptedMaster != null) {
-			//6. Eltárolom az enkriptált privát hashet.
-			PreferenceUtils.putString(PreferenceContract.KEY_PATTERN, encryptedMaster, context);
+			PreferenceUtils.putString(PreferenceContract.KEY_ENCRYPTED_MASTER, encryptedMaster, context);
+			PreferenceUtils.putString(PreferenceContract.KEY_RAW_MASTER, generatedKey, context);
 		}
 	}
 
-	public static String encryptPattern(Context context, String pattern, String alias, RSAPublicKey rsaPublicKey) {
+	public static String encryptMasterKeyDataPattern(String pattern, RSAPublicKey rsaPublicKey) {
 		return RSACryptingUtils.RSAEncrypt(pattern, rsaPublicKey);
 	}
 
-	public static String decryptPattern(Context context, String pattern, String alias) {
+	public static String decryptPattern(String pattern, String alias) {
 		return RSACryptingUtils.RSADecrypt(pattern, RSACryptingUtils.getRSAPrivateKey(alias));
 	}
 

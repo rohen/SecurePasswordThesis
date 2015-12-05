@@ -14,6 +14,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
@@ -23,6 +24,8 @@ import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.List;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.security.auth.x500.X500Principal;
 
 import hu.bme.alit.wear.common.SharedData;
@@ -108,5 +111,21 @@ public class CryptoUtils {
 			ignored.printStackTrace();
 			return null;
 		}
+	}
+
+	public static String getMasterKey() {
+		SecureRandom secureRandom = new SecureRandom();
+		KeyGenerator keyGen;
+		try {
+			keyGen = KeyGenerator.getInstance("AES");
+			keyGen.init(secureRandom);
+			keyGen.init(256);
+			SecretKey secretKey = keyGen.generateKey();
+			byte[] secretKeyInBytes = secretKey.getEncoded();
+			return CryptoFormatUtils.convertToString(secretKeyInBytes);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

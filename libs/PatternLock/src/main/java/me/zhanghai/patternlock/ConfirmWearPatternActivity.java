@@ -1,5 +1,6 @@
 package me.zhanghai.patternlock;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import java.util.List;
@@ -9,6 +10,8 @@ import java.util.List;
  */
 public class ConfirmWearPatternActivity extends BaseWearPatternActivity
 		implements PatternView.OnPatternListener {
+
+	public static final String EXTRA_KEY_PATTERN_HEXED = "pattern_hexed";
 
 	private static final String KEY_NUM_FAILED_ATTEMPTS = "num_failed_attempts";
 
@@ -53,7 +56,10 @@ public class ConfirmWearPatternActivity extends BaseWearPatternActivity
 	@Override
 	public void onPatternDetected(List<PatternView.Cell> pattern) {
 		if (isPatternCorrect(pattern)) {
-			onConfirmed();
+			String patternHexed = PatternUtils.getSha1Hex(pattern);
+			Intent intent = new Intent();
+			intent.putExtra(EXTRA_KEY_PATTERN_HEXED, patternHexed);
+			onConfirmed(intent);
 		} else {
 			patternView.setDisplayMode(PatternView.DisplayMode.Wrong);
 			postClearPatternRunnable();
@@ -74,8 +80,8 @@ public class ConfirmWearPatternActivity extends BaseWearPatternActivity
 		return true;
 	}
 
-	protected void onConfirmed() {
-		setResult(RESULT_OK);
+	protected void onConfirmed(Intent intent) {
+		setResult(RESULT_OK, intent);
 		finish();
 	}
 

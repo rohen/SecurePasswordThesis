@@ -14,6 +14,8 @@ import com.google.android.gms.wearable.Wearable;
 
 import java.util.Date;
 
+import hu.bme.alit.wear.common.SharedData;
+
 /**
  * Default implementation of {@link WearSyncHelper}.
  */
@@ -40,7 +42,7 @@ public class DefaultWearSyncHelper implements WearSyncHelper {
 
 	@Override
 	public void disconnectGoogleApiClient() {
-		if(dataListener != null) {
+		if (dataListener != null) {
 			Wearable.DataApi.removeListener(googleApiClient, dataListener);
 		}
 		googleApiClient.disconnect();
@@ -48,7 +50,7 @@ public class DefaultWearSyncHelper implements WearSyncHelper {
 
 	@Override
 	public void connectedGoogleApiClient() {
-		if(dataListener != null) {
+		if (dataListener != null) {
 			Wearable.DataApi.addListener(googleApiClient, dataListener);
 		}
 	}
@@ -70,5 +72,12 @@ public class DefaultWearSyncHelper implements WearSyncHelper {
 				}
 			}
 		});
+	}
+
+	@Override
+	public void sendSimpleStringData(String requestPath, String data) {
+		DataMap dataMap = new DataMap();
+		dataMap.putString(SharedData.SEND_DATA, data);
+		sendData(requestPath, dataMap);
 	}
 }

@@ -99,14 +99,12 @@ public class AddFragment extends Fragment {
 
 			hideKeyboard();
 
-			//8. Felveszek egy új adatot.
 			String password = passwordEditText.getText().toString();
 			String passwordAgain = passwordAgainEditText.getText().toString();
 			if (!password.equals(passwordAgain)) {
 				showSnackBarMessage(getString(R.string.add_password_not_equal));
 				return;
 			}
-			//7. Bekérem újra a kulcsmintát a felhasználótól, amit hashelek.
 			PatternLockUtils.confirmPattern(getActivity(), AddFragment.this);
 
 		}
@@ -119,7 +117,6 @@ public class AddFragment extends Fragment {
 			String subject = subjectEditText.getText().toString();
 			String password = passwordEditText.getText().toString();
 
-			//13.Ha megegyezik, akkor szinkron módon titkosítom az adatot a kulcsminta hasheével.
 			String encryptedPassword = AesCryptingUtils.encrypt(password, hexedPattern);
 			if (!subject.equals("") && encryptedPassword != null && storeHelper.addPassword(subject, encryptedPassword)) {
 				sendMessageToWear(subject, encryptedPassword);
@@ -131,10 +128,6 @@ public class AddFragment extends Fragment {
 		} else {
 			super.onActivityResult(requestCode, resultCode, data);
 		}
-	}
-
-	private String encryptPassword(String password) {
-		return RSACryptingUtils.RSAEncrypt(password, RSACryptingUtils.getRSAPublicKey(SharedData.CRYPTO_ALIAS_MASTER));
 	}
 
 	private void sendMessageToWear(String subject, String password) {

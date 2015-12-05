@@ -11,8 +11,6 @@ import hu.bme.alit.wear.common.SharedData;
 import hu.bme.alit.wear.common.helper.StoreHelper;
 import hu.bme.alit.wear.common.security.AesCryptingUtils;
 import hu.bme.alit.wear.common.security.RSACryptingUtils;
-import hu.bme.alit.wear.common.utils.PreferenceContract;
-import hu.bme.alit.wear.common.utils.PreferenceUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
 
 /**
@@ -23,33 +21,25 @@ public class DetailsFragment extends Fragment {
 	public final static String FRAGMENT_DETAILS_PASSWORD_TAG = "fragment_details_password_tag";
 
 	public final static String EXTRA_SUBJECT = "extra_subject";
-
-	private StoreHelper storeHelper;
-
-	private String selectedSubject;
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		Bundle bundle = this.getArguments();
-		selectedSubject = bundle.getString(EXTRA_SUBJECT);
-	}
+	public static final String EXTRA_KEY = "extra_key";
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 
+		Bundle bundle = this.getArguments();
+		String selectedSubject = bundle.getString(EXTRA_SUBJECT);
+		String encryptionKey = bundle.getString(EXTRA_KEY);
+
 		View view = inflater.inflate(R.layout.fragment_details, container, false);
 
 		TextView passwordText = (TextView) view.findViewById(R.id.password_text);
 
-		storeHelper = ((MainActivity) getActivity()).getStoreHelper();
+		StoreHelper storeHelper = ((MainActivity) getActivity()).getStoreHelper();
 
 		String rsaEncryptedPassword = storeHelper.getPassword(selectedSubject);
 		String aesEncryptedPassword = RSACryptingUtils.RSADecrypt(rsaEncryptedPassword, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS_WEAR));
-		String encryptedCorrectPattern = PreferenceUtils.getString(PreferenceContract.KEY_PATTERN, null, getActivity());
-		String password = AesCryptingUtils.decrypt(aesEncryptedPassword, encryptedCorrectPattern);
+		String password = AesCryptingUtils.decrypt(aesEncryptedPassword, encryptionKey);
 
 		passwordText.setText(password);
 

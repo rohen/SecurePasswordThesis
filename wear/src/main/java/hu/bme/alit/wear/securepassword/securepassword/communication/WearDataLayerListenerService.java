@@ -80,11 +80,16 @@ public class WearDataLayerListenerService extends WearableListenerService implem
 						intent.putExtra(DATA_BROADCAST_CHANGED, true);
 						sendBroadcast(intent);
 					}
-				} else if (item.getUri().getPath().compareTo(SharedData.REQUEST_PATH_PATTERN) == 0) {
+				} else if (item.getUri().getPath().compareTo(SharedData.REQUEST_PATH_ENCRYPTED_MASTER_KEY) == 0) {
 					DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
-					DataMap receivedDataMap = dataMap.get(SharedData.REQUEST_PATH_PATTERN);
+					DataMap receivedDataMap = dataMap.get(SharedData.REQUEST_PATH_ENCRYPTED_MASTER_KEY);
 					String receivedData = receivedDataMap.getString(SharedData.SEND_DATA);
-					PreferenceUtils.putString(PreferenceContract.KEY_PATTERN, receivedData, WearDataLayerListenerService.this);
+					PreferenceUtils.putString(PreferenceContract.KEY_ENCRYPTED_MASTER, receivedData, WearDataLayerListenerService.this);
+				} else if (item.getUri().getPath().compareTo(SharedData.REQUEST_PATH_RAW_MASTER_KEY) == 0) {
+					DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+					DataMap receivedDataMap = dataMap.get(SharedData.REQUEST_PATH_RAW_MASTER_KEY);
+					String receivedData = receivedDataMap.getString(SharedData.SEND_DATA);
+					PreferenceUtils.putString(PreferenceContract.KEY_RAW_MASTER, receivedData, WearDataLayerListenerService.this);
 				}
 			} else if (event.getType() == DataEvent.TYPE_DELETED) {
 				// DataItem deleted

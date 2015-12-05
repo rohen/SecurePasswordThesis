@@ -30,6 +30,6 @@ public class ConfirmPatternActivity extends me.zhanghai.patternlock.ConfirmWearP
 
 	@Override
 	protected boolean isPatternCorrect(List<PatternView.Cell> pattern) {
-		return PatternLockUtils.isPatternCorrect(pattern, this, SharedData.CRYPTO_ALIAS_WEAR);
+		return WearPatternLockUtils.isPatternCorrect(pattern, this, SharedData.CRYPTO_ALIAS_WEAR);
 	}
 }

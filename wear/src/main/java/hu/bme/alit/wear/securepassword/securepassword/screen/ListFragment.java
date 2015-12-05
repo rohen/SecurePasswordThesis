@@ -17,7 +17,8 @@ import hu.bme.alit.wear.common.helper.StoreHelper;
 import hu.bme.alit.wear.common.utils.NavigationUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
 import hu.bme.alit.wear.securepassword.securepassword.list.PasswordListAdapter;
-import hu.bme.alit.wear.securepassword.securepassword.pattern.PatternLockUtils;
+import hu.bme.alit.wear.securepassword.securepassword.pattern.WearPatternLockUtils;
+import me.zhanghai.patternlock.ConfirmPatternActivity;
 
 /**
  * Created by alit on 16/11/2015.
@@ -78,6 +79,7 @@ public class ListFragment extends Fragment {
 			DetailsFragment detailsFragment = new DetailsFragment();
 			Bundle bundle = new Bundle();
 			bundle.putString(DetailsFragment.EXTRA_SUBJECT, subjects.get(clickedPosition));
+			bundle.putString(DetailsFragment.EXTRA_KEY, data.getStringExtra(ConfirmPatternActivity.EXTRA_KEY_PATTERN_HEXED));
 			detailsFragment.setArguments(bundle);
 			NavigationUtils.navigateToFragment(getActivity(), contentFrame, detailsFragment, DetailsFragment.FRAGMENT_DETAILS_PASSWORD_TAG, true, false);
 		} else {
@@ -92,7 +94,7 @@ public class ListFragment extends Fragment {
 	private class PasswordListClickListener implements WearableListView.ClickListener {
 		@Override
 		public void onClick(WearableListView.ViewHolder viewHolder) {
-			PatternLockUtils.confirmPattern(getActivity(), ListFragment.this);
+			WearPatternLockUtils.confirmPattern(getActivity(), ListFragment.this);
 			clickedPosition = viewHolder.getLayoutPosition();
 		}
 

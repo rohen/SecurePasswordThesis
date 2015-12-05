@@ -13,7 +13,8 @@ public class SharedData {
 	public final static String REQUEST_PATH_NEW_DATA = "/send_data_new";
 	public final static String REQUEST_PATH_REMOVED_DATA = "/send_data_removed";
 	public final static String REQUEST_PATH_PUBLIC_KEY_RECEIVED = "/public_key_received";
-	public static final String REQUEST_PATH_PATTERN = "/send_master_password";
+	public static final String REQUEST_PATH_ENCRYPTED_MASTER_KEY = "/send_encrypted_master_key";
+	public static final String REQUEST_PATH_RAW_MASTER_KEY = "/send_raw_master_key";
 
 	public static final String SEND_DATA = "send_data";
 
