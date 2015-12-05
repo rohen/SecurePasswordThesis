@@ -11,19 +11,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
-import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 
 import hu.bme.alit.wear.common.security.AesCryptingUtils;
 import hu.bme.alit.wear.common.security.CryptoUtils;
-import hu.bme.alit.wear.common.security.RSACryptingUtils;
 import hu.bme.alit.wear.common.utils.PreferenceContract;
 import hu.bme.alit.wear.common.utils.PreferenceUtils;
 import me.zhanghai.patternlock.PatternUtils;
 import me.zhanghai.patternlock.PatternView;
 import me.zhanghai.patternlock.SetPatternActivity;
 
-public class PatternLockUtils {
+public class MobilePatternLockUtils {
 
 	public static final int REQUEST_CODE_CONFIRM_PATTERN = 199;
 
@@ -88,14 +86,6 @@ public class PatternLockUtils {
 		}
 	}
 
-	public static String encryptMasterKeyDataPattern(String pattern, RSAPublicKey rsaPublicKey) {
-		return RSACryptingUtils.RSAEncrypt(pattern, rsaPublicKey);
-	}
-
-	public static String decryptPattern(String pattern, String alias) {
-		return RSACryptingUtils.RSADecrypt(pattern, RSACryptingUtils.getRSAPrivateKey(alias));
-	}
-
-	private PatternLockUtils() {
+	private MobilePatternLockUtils() {
 	}
 }

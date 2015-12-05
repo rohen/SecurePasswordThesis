@@ -34,7 +34,7 @@ import hu.bme.alit.wear.common.helper.TimerHelper;
 import hu.bme.alit.wear.common.helper.WearSyncHelper;
 import hu.bme.alit.wear.common.security.AesCryptingUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
-import hu.bme.alit.wear.securepassword.securepassword.pattern.PatternLockUtils;
+import hu.bme.alit.wear.securepassword.securepassword.pattern.MobilePatternLockUtils;
 import me.zhanghai.patternlock.ConfirmPatternActivity;
 
 public class ListFragment extends Fragment implements TimerHelper.TimerCallBack {
@@ -167,7 +167,7 @@ public class ListFragment extends Fragment implements TimerHelper.TimerCallBack 
 
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			PatternLockUtils.confirmPattern(getActivity(), ListFragment.this);
+			MobilePatternLockUtils.confirmPattern(getActivity(), ListFragment.this);
 			clickedPosition = position;
 		}
 

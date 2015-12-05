@@ -34,7 +34,7 @@ import hu.bme.alit.wear.common.utils.PreferenceContract;
 import hu.bme.alit.wear.common.utils.PreferenceUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
 import hu.bme.alit.wear.securepassword.securepassword.communication.MobileDataLayerListenerService;
-import hu.bme.alit.wear.securepassword.securepassword.pattern.PatternLockUtils;
+import hu.bme.alit.wear.securepassword.securepassword.pattern.MobilePatternLockUtils;
 import hu.bme.alit.wear.securepassword.securepassword.pattern.SetPatternActivity;
 import me.zhanghai.patternlock.PatternUtils;
 
@@ -74,26 +74,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		if (!isPasswordAdded) {
 			this.startActivityForResult(new Intent(this, SetPatternActivity.class), RESULT_CREATE_PATTERN_CODE);
 		} else if (savedInstanceState == null) {
-			NavigationUtils.navigateToFragment(this, getContentFrame(), new GreetingsFragment(), GreetingsFragment.FRAGMENT_GREETINGS_TAG, true, false);
+			NavigationUtils.navigateToFragment(this, getContentFrame(), new GreetingsFragment(), GreetingsFragment.FRAGMENT_GREETINGS_TAG, false, false);
 		}
 
 		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 		navigationView.setNavigationItemSelectedListener(this);
-	}
-
-	@Override
-	public void onBackPressed() {
-		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-		if (drawer.isDrawerOpen(GravityCompat.START)) {
-			drawer.closeDrawer(GravityCompat.START);
-		} else {
-			FragmentManager fragmentManager = getFragmentManager();
-			if (fragmentManager.getBackStackEntryCount() > 0) {
-				NavigationUtils.navigateToFragment(this, getContentFrame(), new GreetingsFragment(), GreetingsFragment.FRAGMENT_GREETINGS_TAG, true, false);
-			} else {
-				super.onBackPressed();
-			}
-		}
 	}
 
 	@SuppressWarnings("StatementWithEmptyBody")
@@ -185,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			String patternString = PatternUtils.bytesToString(data.getByteArrayExtra(RESULT_CREATE_PATTERN_DATA));
 
 			String hashPattern = CryptoUtils.getSha1Hex(patternString);
-			PatternLockUtils.savePatternSecurityDataEncrypted(this, hashPattern, SharedData.CRYPTO_ALIAS_MASTER);
+			MobilePatternLockUtils.savePatternSecurityDataEncrypted(this, hashPattern, SharedData.CRYPTO_ALIAS_MASTER);
 
 			sendMasterKeyToWear();
 			PreferenceUtils.putBoolean(PreferenceContract.PATTERN_ADDED, true, this);
@@ -205,6 +190,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			String rawMesterKey = PreferenceUtils.getString(PreferenceContract.KEY_RAW_MASTER, null, this);
 			String encryptedRawMasterKey = RSACryptingUtils.RSAEncrypt(rawMesterKey, rsaPublicKeyWear);
 			wearSyncHelper.sendSimpleStringData(SharedData.REQUEST_PATH_RAW_MASTER_KEY, encryptedRawMasterKey);
+		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+		if (drawer.isDrawerOpen(GravityCompat.START)) {
+			drawer.closeDrawer(GravityCompat.START);
+		} else {
+			FragmentManager fragmentManager = getFragmentManager();
+			GreetingsFragment greetingsFragment = (GreetingsFragment)fragmentManager.findFragmentByTag(GreetingsFragment.FRAGMENT_GREETINGS_TAG);
+			if (greetingsFragment != null && greetingsFragment.isVisible()) {
+				super.onBackPressed();
+				finish();
+			} else {
+				NavigationUtils.navigateToFragment(this, getContentFrame(), new GreetingsFragment(), GreetingsFragment.FRAGMENT_GREETINGS_TAG, false, false);
+			}
 		}
 	}
 }

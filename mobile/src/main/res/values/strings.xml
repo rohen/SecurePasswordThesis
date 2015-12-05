@@ -14,7 +14,7 @@
 	<string name="add_password_again_value">Password again</string>
 	<string name="add_password_not_equal">Passwords are not equal!</string>
 
-	<string name="greetings_text">Please use the navigation drawer to add new password to the password list.</string>
+	<string name="greetings_text">This is a sample app for store securely passwords both on mobile and wear, and communicate in safe.\n\nPlease use the navigation drawer to add new password to the password list.</string>
 	<string name="greetings_fragment_context_ok_button">OK</string>
 	<string name="master_password_title">Add master password</string>
 	<string name="set_pattern_title">Set pattern</string>

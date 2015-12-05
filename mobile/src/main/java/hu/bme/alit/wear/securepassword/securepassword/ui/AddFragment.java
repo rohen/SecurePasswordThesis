@@ -28,7 +28,7 @@ import hu.bme.alit.wear.common.utils.NavigationUtils;
 import hu.bme.alit.wear.common.utils.PreferenceContract;
 import hu.bme.alit.wear.common.utils.PreferenceUtils;
 import hu.bme.alit.wear.securepassword.securepassword.R;
-import hu.bme.alit.wear.securepassword.securepassword.pattern.PatternLockUtils;
+import hu.bme.alit.wear.securepassword.securepassword.pattern.MobilePatternLockUtils;
 import me.zhanghai.patternlock.ConfirmPatternActivity;
 
 public class AddFragment extends Fragment {
@@ -105,7 +105,7 @@ public class AddFragment extends Fragment {
 				showSnackBarMessage(getString(R.string.add_password_not_equal));
 				return;
 			}
-			PatternLockUtils.confirmPattern(getActivity(), AddFragment.this);
+			MobilePatternLockUtils.confirmPattern(getActivity(), AddFragment.this);
 
 		}
 	}

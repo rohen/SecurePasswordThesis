@@ -129,4 +129,9 @@ public class MainActivity extends Activity implements DataApi.DataListener,
 		wearSyncHelper.sendData(SharedData.REQUEST_PATH_PUBLIC_KEY_RECEIVED, sendPublicKey);
 		PreferenceUtils.putBoolean(PreferenceContract.WEAR_PUBLIC_KEY_SENT, true, this);
 	}
+
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+	}
 }
