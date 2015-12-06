@@ -31,13 +31,13 @@ public class WearPatternLockUtils {
 
 		String encryptedRSAMaster = PreferenceUtils.getString(PreferenceContract.KEY_ENCRYPTED_MASTER, null, context);
 		String encryptedMaster = RSACryptingUtils.RSADecrypt(encryptedRSAMaster, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS_WEAR));
-		String decryptedPrivateKey = AesCryptingUtils.decrypt(encryptedMaster, confirmPatternHashed);
+		String decryptedMaster = AesCryptingUtils.decrypt(encryptedMaster, confirmPatternHashed);
+		String decryptedMasterKeyHash = CryptoUtils.getSha1Hex(decryptedMaster);
 
 		String rawMasterRSAEncrypted = PreferenceUtils.getString(PreferenceContract.KEY_RAW_MASTER, null, context);
-		String rawMaster = RSACryptingUtils.RSADecrypt(rawMasterRSAEncrypted, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS_WEAR));
-		String rsaPrivateKeyHex = CryptoUtils.getSha1Hex(rawMaster);
+		String rawMasterKeyHash = RSACryptingUtils.RSADecrypt(rawMasterRSAEncrypted, RSACryptingUtils.getRSAPrivateKey(SharedData.CRYPTO_ALIAS_WEAR));
 
-		return decryptedPrivateKey != null && rsaPrivateKeyHex != null && decryptedPrivateKey.equals(rsaPrivateKeyHex);
+		return decryptedMasterKeyHash != null && rawMasterKeyHash != null && decryptedMasterKeyHash.equals(rawMasterKeyHash);
 	}
 
 	// NOTE: Should only be called when there is a pattern for this account.

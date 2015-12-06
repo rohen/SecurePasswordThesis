@@ -32,14 +32,15 @@ public class MobilePatternLockUtils {
 	public static boolean isPatternCorrect(List<PatternView.Cell> pattern, Context context, String alias) {
 		String confirmPattern = PatternUtils.patternToString(pattern);
 		String confirmPatternHashed = CryptoUtils.getSha1Hex(confirmPattern);
-		//10. A hashhel feloldom a generált privát kulcs hashének titkosítását
+
 		String encryptedMaster = PreferenceUtils.getString(PreferenceContract.KEY_ENCRYPTED_MASTER, null, context);
-		String decryptedPrivateKey = AesCryptingUtils.decrypt(encryptedMaster, confirmPatternHashed);
-		//11. Lekérem a generált kulcspár privát kulcsát, és hashelem.
-		String rawMaster = PreferenceUtils.getString(PreferenceContract.KEY_RAW_MASTER, null, context);
-		String rawMasterKeyHash = CryptoUtils.getSha1Hex(rawMaster);
-		//12. Összehasonlítom az eltárolt privát kulcs hashét.
-		return decryptedPrivateKey != null && rawMasterKeyHash != null && decryptedPrivateKey.equals(rawMasterKeyHash);
+		String decryptedMaster = AesCryptingUtils.decrypt(encryptedMaster, confirmPatternHashed);
+		String decryptedMasterKeyHash = CryptoUtils.getSha1Hex(decryptedMaster);
+
+		String rawMasterKeyHash = PreferenceUtils.getString(PreferenceContract.KEY_RAW_MASTER, null, context);
+
+
+		return decryptedMasterKeyHash != null && rawMasterKeyHash != null && decryptedMasterKeyHash.equals(rawMasterKeyHash);
 	}
 
 	public static void clearPattern(Context context) {
@@ -78,11 +79,11 @@ public class MobilePatternLockUtils {
 
 	public static void savePatternSecurityDataEncrypted(Context context, String hashPattern, String alias) {
 		String generatedKey = CryptoUtils.getMasterKey();
+		String encryptedMaster = AesCryptingUtils.encrypt(generatedKey, hashPattern);
 		String generatedKeyHex = CryptoUtils.getSha1Hex(generatedKey);
-		String encryptedMaster = AesCryptingUtils.encrypt(generatedKeyHex, hashPattern);
 		if (encryptedMaster != null) {
 			PreferenceUtils.putString(PreferenceContract.KEY_ENCRYPTED_MASTER, encryptedMaster, context);
-			PreferenceUtils.putString(PreferenceContract.KEY_RAW_MASTER, generatedKey, context);
+			PreferenceUtils.putString(PreferenceContract.KEY_RAW_MASTER, generatedKeyHex, context);
 		}
 	}
 
