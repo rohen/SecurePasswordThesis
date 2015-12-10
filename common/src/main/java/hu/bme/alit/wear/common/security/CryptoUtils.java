@@ -40,7 +40,7 @@ public class CryptoUtils {
 			if (!getKeyStore().containsAlias(alias)) {
 				Calendar start = Calendar.getInstance();
 				Calendar end = Calendar.getInstance();
-				end.add(Calendar.YEAR, 1);
+				end.add(Calendar.YEAR, 99);
 				//TODO recode to KeyGenParameterSpec
 				KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(context)
 						.setAlias(alias)
